@@ -763,7 +763,7 @@
   function refreshRef(){
     const id = localStorage.getItem('refId');
     const el = document.getElementById('refId'); if (el) el.textContent = id;
-    const link = document.getElementById('refLink'); if (link) link.textContent = location.href.split('?')[0] + '?ref=' + id;
+    const link = document.getElementById('refLink'); if (link) link.textContent = 'https://dahaboboru03-web.github.io/earnhub/?ref=' + id;
   }
   function claimReferral(){
     const val = document.getElementById('refInput').value.trim();
