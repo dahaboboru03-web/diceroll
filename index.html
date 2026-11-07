@@ -648,42 +648,22 @@
   }
   const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
   let rolling = false;
-  function rollDice(){
+function rollDice(){
     const bet = parseFloat(document.getElementById('betAmt').value);
     if (!bet || bet < 10 || bet > 70000){ toast('Bet must be between KES 10 and KES 70,000'); return; }
     if (bet > balance){ toast('Insufficient balance'); return; }
-    balance -= bet; updateUI();
-    if (rolling) { rolling = false; const b=document.getElementById('rollBtn'); if(b) b.disabled=false; }
-    rolling = true;
-    const ud = document.getElementById('userDice'); const ad = document.getElementById('aiDice');
-    ud.classList.add('rolling'); ad.classList.add('rolling');
-    const status = document.getElementById('diceStatus');
-    const result = document.getElementById('diceResult');
-    status.textContent = 'Rolling...';
-    result.textContent = '';
-    let ticks = 0;
-    const iv = setInterval(()=>{
-      try {
-        document.getElementById('userDice').textContent = faces[Math.floor(Math.random()*6)];
-        document.getElementById('aiDice').textContent = faces[Math.floor(Math.random()*6)];
-        ticks++;
-        if (ticks > 12){
-          clearInterval(iv);
-          const user = Math.floor(Math.random()*6)+1;
-          const ai = Math.floor(Math.random()*6)+1;
-          document.getElementById('userDice').textContent = faces[user-1];
-          document.getElementById('aiDice').textContent = faces[ai-1];
-          document.getElementById('userDice').classList.remove('rolling');
-          document.getElementById('aiDice').classList.remove('rolling');
-          if (user > ai){ status.textContent = 'Your turn result: Win!'; result.textContent = `You rolled ${user}, AI rolled ${ai} — You win ${money(bet*2)}!`; result.style.color='var(--green)'; balance += bet*2; total += bet; txns.unshift({label:'Won dice vs AI', amount:bet*2, time:new Date().toLocaleTimeString()}); activity.unshift('Won dice vs AI — ' + money(bet*2)); updateUI(); }
-          else if (user < ai){ status.textContent = 'AI wins this round'; result.textContent = `You rolled ${user}, AI rolled ${ai} — AI wins.`; result.style.color='var(--red)'; toast('Lost ' + money(bet)); txns.unshift({label:'Lost dice vs AI', amount:-bet, time:new Date().toLocaleTimeString()}); activity.unshift('Lost dice vs AI — ' + money(bet)); updateUI(); }
-          else { status.textContent = 'Tie'; result.textContent = `Tie (${user}). Bet refunded.`; result.style.color='var(--muted)'; balance += bet; updateUI(); }
-        }
-      } catch(e){ clearInterval(iv); rolling=false; btn.disabled=false; }
-    }, 80);
-    setTimeout(()=>{ rolling=false; btn.disabled=false; }, 1200);
-  }
-  function setAmt(id,n){ document.getElementById(id).value = n; }
+    balance -= bet;
+    const user = Math.floor(Math.random()*6)+1;
+    const ai = Math.floor(Math.random()*6)+1;
+    const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    document.getElementById('userDice').textContent = faces[user-1];
+    document.getElementById('aiDice').textContent = faces[ai-1];
+    if (user > ai){ document.getElementById('diceResult').textContent = 'You rolled '+user+', AI rolled '+ai+' — You win '+money(bet*2)+'!'; document.getElementById('diceResult').style.color='var(--green)'; balance += bet*2; total += bet; txns.unshift({label:'Won dice vs AI', amount:bet*2, time:new Date().toLocaleTimeString()}); }
+    else if (user < ai){ document.getElementById('diceResult').textContent = 'You rolled '+user+', AI rolled '+ai+' — AI wins.'; document.getElementById('diceResult').style.color='var(--red)'; txns.unshift({label:'Lost dice vs AI', amount:-bet, time:new Date().toLocaleTimeString()}); }
+    else { document.getElementById('diceResult').textContent = 'Tie ('+user+'). Bet refunded.'; document.getElementById('diceResult').style.color='var(--muted)'; balance += bet; }
+    document.getElementById('diceStatus').textContent = 'Your turn — roll the dice!';
+    updateUI();
+  }  function setAmt(id,n){ document.getElementById(id).value = n; }
   function withdraw(){ document.getElementById('withdrawModal').classList.remove('hidden'); document.getElementById('wdAmt').focus(); document.getElementById('wdErr').style.display='none'; }
   function closeWithdraw(){ document.getElementById('withdrawModal').classList.add('hidden'); document.getElementById('wdAmt').value=''; document.getElementById('wdErr').style.display='none'; }
   let wdMethod='', wdAmtVal=0;
