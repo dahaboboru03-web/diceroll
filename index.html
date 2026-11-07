@@ -801,9 +801,7 @@ function rollDice(){
       const el2 = document.getElementById('sTimerList'); if (el2 && id==='sTimer') { if (!last){ el2.textContent=''; } else { const rem = (24*60*60*1000) - (Date.now()-+last); if (rem <= 0){ el2.textContent='Available now'; } else { const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000); el2.textContent = `Next reward in ${h}h ${m}m ${s}s`; } } }
     });
   },1000);
-</script>
-</body>
-</html>function rollDice(){
+function rollDice(){
     const bet = parseFloat(document.getElementById('betAmt').value);
     if (!bet || bet < 10 || bet > 70000){ toast('Bet must be between KES 10 and KES 70,000'); return; }
     if (bet > balance){ toast('Insufficient balance'); return; }
