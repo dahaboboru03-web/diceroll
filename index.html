@@ -334,7 +334,7 @@
         <h3>Enter Referral ID of Person You Referred</h3>
         <p>Enter the referral ID of the friend you referred to claim your bonus.</p>
         <input type="number" id="refInput" placeholder="Referral ID" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-        <button class="btn" onclick="bonus+=50; updateUI(); toast('Bonus awarded'); document.getElementById('refSuccess').classList.remove('hidden');">Claim Bonus</button>
+        <button class="btn" onclick="claimReferral()">Claim Bonus</button>
         <div id="refErr" style="color:var(--red); font-size:12px; margin-top:6px; display:none;"></div>
       </div>
     </section>
@@ -829,7 +829,19 @@ function rollDice(){
         else if (user < ai){ status.textContent = 'AI wins!'; result.textContent = 'You rolled '+user+', AI rolled '+ai+' — AI wins.'; result.style.color='var(--red)'; txns.unshift({label:'Lost dice vs AI', amount:-bet, time:new Date().toLocaleTimeString()}); }
         else { status.textContent = 'Tie'; result.textContent = 'Tie ('+user+'). Bet refunded.'; result.style.color='var(--muted)'; balance += bet; }
         status.textContent = 'Your turn — roll the dice!';
-        updateUI();
+  function claimReferral(){
+    const val = document.getElementById('refInput').value.trim();
+    const err = document.getElementById('refErr');
+    err.style.display='none';
+    if (!val){ err.textContent='Enter a referral ID'; err.style.display='block'; return; }
+    bonus += 50;
+    txns.unshift({label:'Referral bonus', amount:50, time:new Date().toLocaleTimeString()});
+    activity.unshift('Referral bonus — KES 50.00');
+    updateUI();
+    toast('Bonus KES 50.00 awarded!');
+    const o = document.getElementById('refSuccess'); if (o) o.classList.remove('hidden');
+  }
+  updateUI();
       }
     }, 80);
   }  function setAmt(id,n){ document.getElementById(id).value = n; }
