@@ -720,7 +720,7 @@ function rollDice(){
     if (m === 'Bonus'){
       if (bonus < depAmtVal){ document.getElementById('depMethodErr').style.display='block'; setTimeout(()=>document.getElementById('depMethodErr').style.display='none',5000); document.getElementById('depMethodOverlay').classList.remove('hidden'); return; }
       document.getElementById('depMethodErr').style.display='none';
-      bonus -= depAmtVal; balance += depAmtVal; total += depAmtVal;
+      bonus -= depAmtVal; balance += depAmtVal; total += depAmtVal; saveState();
       txns.unshift({label:'Deposit (Bonus)', amount:depAmtVal, time:new Date().toLocaleTimeString()});
       activity.unshift('Deposit — ' + money(depAmtVal));
       document.getElementById('depTitle').textContent = 'Deposit Successful';
