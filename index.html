@@ -770,6 +770,7 @@
     const link = document.getElementById('refLink').textContent;
     navigator.clipboard.writeText(link).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));
   }
+  function claimReferral(){
     const val = document.getElementById('refInput').value.trim();
     const err = document.getElementById('refErr');
     err.style.display='none';
