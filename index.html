@@ -332,6 +332,7 @@
         <div class="ref-code" id="refId">-</div>
         <p style="margin-top:10px;">Share this link with friends and ask them to give you their referral ID to earn bonus:</p>
         <div class="ref-code" id="refLink" style="font-size:12px; word-break:break-all;"></div>
+        <button class="btn" style="margin-top:8px;" onclick="copyRef()">Copy Link</button>
       </div>
       <div class="card" style="margin-top:16px;">
         <h3>Enter Referral ID of Person You Referred</h3>
@@ -765,7 +766,10 @@
     const el = document.getElementById('refId'); if (el) el.textContent = id;
     const link = document.getElementById('refLink'); if (link) link.textContent = 'https://dahaboboru03-web.github.io/earnhub/?ref=' + id;
   }
-  function claimReferral(){
+  function copyRef(){
+    const link = document.getElementById('refLink').textContent;
+    navigator.clipboard.writeText(link).then(()=>toast('Copied')).catch(()=>toast('Copy failed'));
+  }
     const val = document.getElementById('refInput').value.trim();
     const err = document.getElementById('refErr');
     err.style.display='none';
