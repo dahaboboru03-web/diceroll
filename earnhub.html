@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EarnHub — Earn by Watching, Surveys, Referrals & Dice</title>
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --card: #141a2a;
+    --card2: #1b2236;
+    --accent: #7c5cff;
+    --accent2: #22d3ee;
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #e6eaf2;
+    --muted: #9aa3b2;
+    --border: #2a3348;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #1a2040, transparent), var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .app { display: flex; min-height: 100vh; }
+  aside {
+    width: 240px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 20px 14px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .brand { font-size: 22px; font-weight: 800; color: var(--accent2); margin-bottom: 24px; }
+  .brand span { color: var(--gold); }
+  nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    color: var(--muted); text-decoration: none; margin-bottom: 4px;
+    cursor: pointer; font-size: 14px;
+  }
+  nav a.active, nav a:hover { background: var(--card2); color: var(--text); }
+  main { flex: 1; padding: 24px; max-width: 1100px; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .wallet-pill {
+    position: fixed; top: 16px; right: 16px; z-index: 1500;
+    background: linear-gradient(135deg, #7c5cff, #22d3ee);
+    padding: 12px 20px; border-radius: 999px; font-weight: 800; font-size: 15px;
+    box-shadow: 0 8px 30px rgba(124,92,255,.5), 0 0 0 1px rgba(255,255,255,.15) inset;
+    backdrop-filter: blur(8px);
+  }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .grid { display: grid; gap: 16px; }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px;
+  }
+  .card h3 { margin: 0 0 8px; }
+  .card p { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  .btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 10px 16px; border-radius: 10px; cursor: pointer;
+    font-weight: 600; font-size: 14px; transition: transform .1s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.green { background: var(--green); }
+  .btn.gold { background: var(--gold); color: #1a1a1a; }
+  .btn.red { background: var(--red); }
+  .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .stat { font-size: 30px; font-weight: 800; }
+  .stat small { font-size: 12px; color: var(--muted); font-weight: 400; display: block; }
+  .video-box {
+    background: #000; border-radius: 12px; overflow: hidden;
+    aspect-ratio: 16/9; position: relative; margin-bottom: 12px;
+  }
+  .video-box .play {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 48px; color: #fff;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+  }
+  .progress { height: 6px; background: var(--card2); border-radius: 4px; overflow: hidden; margin: 8px 0; }
+  .progress > div { height: 100%; background: var(--accent2); width: 0%; transition: width .3s; }
+  .survey-q { margin: 12px 0; }
+  .survey-q label { display: block; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin: 6px 0; cursor: pointer; }
+  .survey-q label:hover { border-color: var(--accent); }
+  .dice-area { text-align: center; }
+  .dice { font-size: 80px; margin: 16px; display:inline-block; padding:10px; border-radius:16px; background: transparent; box-shadow: 0 10px 20px rgba(0,0,0,.4); transform: perspective(500px) rotateX(15deg) rotateY(-15deg); color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,.6); }
+  .dice.rolling { animation: diceRoll .6s linear infinite; }
+  @keyframes diceRoll { 0%{transform:perspective(500px) rotateX(0deg) rotateY(0deg);} 100%{transform:perspective(500px) rotateX(360deg) rotateY(360deg);} }
+  .wallet-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .wallet-row:last-child { border: none; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; background: var(--card2); color: var(--muted); }
+  .toast {
+    position: fixed; bottom: 20px; right: 20px; background: var(--card2);
+    border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.4); z-index: 1000;
+    animation: slide .3s ease;
+  }
+  @keyframes slide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .hidden { display: none !important; }
+  .ref-code { font-family: monospace; background: var(--card2); padding: 8px 12px; border-radius: 8px; display: inline-block; letter-spacing: 2px; }
+  .leader { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+  .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; width: 360px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .modal-box h3 { margin: 0 0 8px; }
+  .modal-box input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 16px; margin: 12px 0; }
+  .overlay { position: fixed; inset: 0; background: rgba(10,14,24,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 3000; }
+  .overlay-box { background: linear-gradient(160deg, #1b2236, #141a2a); border: 1px solid var(--border); border-radius: 22px; padding: 32px; width: 400px; max-width: 90vw; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.6); animation: pop .25s ease; }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .overlay-box .big { font-size: 48px; margin-bottom: 10px; }
+  .overlay-box h3 { margin: 0 0 6px; }
+  .overlay-box p { color: var(--muted); font-size: 14px; margin: 4px 0; }
+  .overlay-box .info { background: var(--card2); border-radius: 12px; padding: 14px; margin: 16px 0; text-align: left; font-size: 14px; }
+  .overlay-box .info div { display: flex; justify-content: space-between; padding: 4px 0; }
+  .overlay-box .info strong { color: var(--text); }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">Earn<span>Hub</span></div>
+    <nav>
+      <a class="active" data-view="home">🏠 Dashboard</a>
+      <a data-view="videos">🎬 Watch Videos</a>
+      <a data-view="surveys">📋 Surveys</a>
+      <a data-view="dice">🎲 Dice vs AI</a>
+      <a data-view="refer">👥 Refer Friends</a>
+      <a data-view="profile">👤 My Profile</a>
+      <a data-view="contact">📞 Contact</a>
+      <a data-view="wallet">💰 Wallet</a>
+    </nav>
+    <div style="margin-top:24px; font-size:12px; color:var(--muted);">
+      Earn points, redeem anytime.
+    </div>
+  </aside>
+  <main>
+    <div class="topbar">
+      <div>
+        <h1 id="title">Dashboard</h1>
+        <p class="sub" id="subtitle">Welcome back — start earning today.</p>
+      </div>
+      <div class="wallet-pill" id="walletPill" onclick="show('wallet')" style="cursor:pointer;">KES 0.00</div>
+    </div>
+
+    <!-- HOME -->
+    <section id="home">
+      <div class="grid grid-3">
+        <div class="card"><div class="stat" id="statBalance">KES 0.00<small>Wallet balance</small></div></div>
+        <div class="card"><div class="stat" id="statTasks">0<small>Tasks completed</small></div></div>
+        <div class="card"><div class="stat" id="statRef">0<small>Friends referred</small></div></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h3>Recent Activity</h3>
+        <div id="activity"></div>
+      </div>
+    </section>
+
+    <!-- VIDEOS -->
+    <section id="videos" class="hidden">
+      <div class="grid grid-3">
+        <div class="card">
+        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/nSuHI99MR7A','lastVideo1');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
+        <h3>ITAANA OFFICIAL VIDEO BY NAITEMU</h3>
+        <p>Watch on YouTube to earn KES 10.00</p>
+          <div class="progress"><div id="vprog"></div></div>
+          <button class="btn" id="vbtn" onclick="watchVideo('https://youtu.be/nSuHI99MR7A','lastVideo1')">Start watching</button>
+          <div id="vTimer1" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+        <div class="card">
+        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/zF4UcecXqB0','lastVideo2');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
+        <h3>AIRA ASIPANI OFFICIAL 4K VIDEO BY NAITEMU</h3>
+        <p>Watch on YouTube to earn KES 10.00</p>
+          <div class="progress"><div></div></div>
+          <button class="btn" onclick="watchVideo('https://youtu.be/zF4UcecXqB0','lastVideo2')">Start watching</button>
+          <div id="vTimer2" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+        <div class="card">
+        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/07KMvIfr49I','lastVideo3');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
+        <h3>SUPATI OFFICIAL 4K VIDEO BY NAITEMU</h3>
+        <p>Watch on YouTube to earn KES 10.00</p>
+          <div class="progress"><div></div></div>
+          <button class="btn" onclick="watchVideo('https://youtu.be/07KMvIfr49I','lastVideo3')">Start watching</button>
+          <div id="vTimer3" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+        <div class="card">
+        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/ghzyTalVD5g','lastVideo4');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
+        <h3>AIDIPA OFFICIAL 4K MUSIC VIDEO BY NAITEMU</h3>
+        <p>Watch on YouTube to earn KES 10.00</p>
+          <div class="progress"><div></div></div>
+          <button class="btn" onclick="watchVideo('https://youtu.be/ghzyTalVD5g','lastVideo4')">Start watching</button>
+          <div id="vTimer4" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+        <div class="card">
+        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/TnJ8bjyzBZU','lastVideo5');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
+        <h3>NAITEMU - KIBOITARE ENAKE OFFICIAL MUSIC VIDEO</h3>
+        <p>Watch on YouTube to earn KES 10.00</p>
+          <div class="progress"><div></div></div>
+          <button class="btn" onclick="watchVideo('https://youtu.be/TnJ8bjyzBZU','lastVideo5')">Start watching</button>
+          <div id="vTimer5" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+        <div class="card">
+        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/cUvbQQGKNag','lastVideo6');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
+        <h3>KINTAASA OFFICIAL 4K VIDEO BY NAITEMU</h3>
+        <p>Watch on YouTube to earn KES 10.00</p>
+          <div class="progress"><div></div></div>
+          <button class="btn" onclick="watchVideo('https://youtu.be/cUvbQQGKNag','lastVideo6')">Start watching</button>
+          <div id="vTimer6" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SURVEYS -->
+    <section id="surveys" class="hidden">
+      <div id="surveyList">
+        <div class="card" style="cursor:pointer;" onclick="openSurvey(1)">
+          <h3>Survey 1 — Consumer Habits</h3>
+          <p>Reward: KES 50.00 • 3 questions</p>
+          <div id="sTimerList" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+        <div class="card" style="cursor:pointer; margin-top:12px;" onclick="openSurvey(2)">
+          <h3>Survey 2 — Social Media & Youth</h3>
+          <p>Reward: KES 50.00 • 3 questions</p>
+          <div id="sTimerList2" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+      </div>
+      <div id="surveyForm1" class="hidden">
+        <button class="btn ghost" onclick="closeSurvey()" style="margin-bottom:12px;">← Back to list</button>
+        <div class="card">
+          <h3>Quick Survey — Consumer Habits</h3>
+          <p>Reward: KES 50.00 • 3 questions</p>
+          <div class="survey-q">
+            <strong>1. How often do you shop online?</strong>
+            <label><input type="radio" name="q1" value="daily"> Daily</label>
+            <label><input type="radio" name="q1" value="weekly"> Weekly</label>
+            <label><input type="radio" name="q1" value="monthly"> Monthly</label>
+          </div>
+          <div class="survey-q">
+            <strong>2. Preferred payment method?</strong>
+            <label><input type="radio" name="q2" value="card"> Card</label>
+            <label><input type="radio" name="q2" value="wallet"> Digital wallet</label>
+            <label><input type="radio" name="q2" value="cash"> Cash</label>
+          </div>
+          <div class="survey-q">
+            <strong>3. Would you recommend EarnHub?</strong>
+            <label><input type="radio" name="q3" value="yes"> Yes</label>
+            <label><input type="radio" name="q3" value="no"> No</label>
+          </div>
+          <button class="btn green" onclick="submitSurvey()">Submit Survey</button>
+          <div id="sTimer" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+         </div>
+      </div>
+      <div id="surveyForm2" class="hidden">
+        <button class="btn ghost" onclick="closeSurvey()" style="margin-bottom:12px;">← Back to list</button>
+        <div class="card">
+          <h3>Survey 2 — Social Media & Youth</h3>
+          <p>Reward: KES 50.00 • 3 questions</p>
+          <div class="survey-q">
+            <strong>1. How often do you use social media?</strong>
+            <label><input type="radio" name="q4" value="daily"> Daily</label>
+            <label><input type="radio" name="q4" value="weekly"> Weekly</label>
+            <label><input type="radio" name="q4" value="rarely"> Rarely</label>
+          </div>
+          <div class="survey-q">
+            <strong>2. Which platform do you use most?</strong>
+            <label><input type="radio" name="q5" value="tiktok"> TikTok</label>
+            <label><input type="radio" name="q5" value="instagram"> Instagram</label>
+            <label><input type="radio" name="q5" value="facebook"> Facebook</label>
+          </div>
+          <div class="survey-q">
+            <strong>3. Do you think social media affects youth mental health?</strong>
+            <label><input type="radio" name="q6" value="yes"> Yes</label>
+            <label><input type="radio" name="q6" value="no"> No</label>
+          </div>
+          <button class="btn green" onclick="submitSurvey2()">Submit Survey</button>
+          <div id="sTimer2" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+        </div>
+      </div>
+    </section>
+    <section id="dice" class="hidden">
+      <div class="card dice-area">
+        <h3>Roll Dice vs AI</h3>
+        <p>Enter your bet amount. Win pays 2x your bet.</p>
+        <input type="number" id="betAmt" placeholder="Bet amount (KES)" min="10" max="70000" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+          <button class="btn ghost" onclick="setAmt('betAmt',10)">10</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',20)">20</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',30)">30</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',40)">40</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',50)">50</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',100)">100</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',150)">150</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',200)">200</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',250)">250</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',500)">500</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',1000)">1000</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',2000)">2000</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',5000)">5000</button>
+          <button class="btn ghost" onclick="setAmt('betAmt',10000)">10000</button>
+        </div>
+        <div style="display:flex; gap:24px; justify-content:center; flex-wrap:wrap; margin:16px 0;">
+          <div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">You</div>
+            <div class="dice" id="userDice">🎲</div>
+          </div>
+          <div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">AI</div>
+            <div class="dice" id="aiDice">🎲</div>
+          </div>
+        </div>
+        <div id="diceStatus" style="margin:10px 0; color:var(--accent2); font-weight:600;">Your turn — roll the dice!</div>
+        <div id="diceResult" style="margin:6px 0; color:var(--muted);"></div>
+        <button class="btn gold" id="rollBtn" onclick="rollDice()">Roll Dice</button>
+      </div>
+    </section>
+
+    <!-- REFER -->
+    <section id="refer" class="hidden">
+      <div class="card">
+        <h3>Your Referral ID</h3>
+        <div class="ref-code" id="refId">-</div>
+        <p style="margin-top:10px;">Share this link with friends and ask them to give you their referral ID to earn bonus:</p>
+        <div class="ref-code" id="refLink" style="font-size:12px; word-break:break-all;"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h3>Enter Referral ID of Person You Referred</h3>
+        <p>Enter the referral ID of the friend you referred to claim your bonus.</p>
+        <input type="number" id="refInput" placeholder="Referral ID" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
+        <button class="btn" onclick="bonus+=50; updateUI(); toast('Bonus awarded'); document.getElementById('refSuccess').classList.remove('hidden');">Claim Bonus</button>
+        <div id="refErr" style="color:var(--red); font-size:12px; margin-top:6px; display:none;"></div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile" class="hidden">
+      <div class="card">
+        <h3>Bind Withdrawal M-Pesa Number</h3>
+        <input type="tel" id="wdAddr" placeholder="M-Pesa number" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
+        <div style="display:flex; gap:8px;">
+          <button class="btn" onclick="bindAddr('wd')">Bind</button>
+          <button class="btn ghost" id="wdChange" onclick="changeAddr('wd')" style="display:none;">Change</button>
+        </div>
+        <div id="wdAddrShow" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h3>Bind Deposit M-Pesa Number</h3>
+        <input type="tel" id="depAddr" placeholder="M-Pesa number" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
+        <div style="display:flex; gap:8px;">
+          <button class="btn" onclick="bindAddr('dep')">Bind</button>
+          <button class="btn ghost" id="depChange" onclick="changeAddr('dep')" style="display:none;">Change</button>
+        </div>
+        <div id="depAddrShow" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="hidden">
+      <div class="card">
+        <h3>Contact Supervisor</h3>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <a href="https://wa.me/254743733752?text=Hello%2C%20I%20am%20using%20EarnHub%20and%20need%20assistance." target="_blank" style="display:inline-block; line-height:0;"><svg width="48" height="48" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="https://m.me/100086979147587?text=Hello%2C%20I%20am%20using%20EarnHub%20and%20need%20assistance." target="_blank" style="display:inline-block; line-height:0;"><svg width="48" height="48" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- WALLET -->
+    <section id="wallet" class="hidden">
+      <div class="card">
+        <h3>Wallet</h3>
+        <div class="wallet-row"><span>Available balance</span><strong id="wBal">KES 0.00</strong></div>
+        <div class="wallet-row"><span>Bonus</span><strong id="bonusBal">KES 0.00</strong></div>
+        <div class="wallet-row"><span>Total earned</span><strong id="wTotal">KES 0.00</strong></div>
+        <div class="wallet-row"><span>Total withdrawn</span><strong id="wWithdrawn">KES 0.00</strong></div>
+        <div style="margin-top:14px; display:flex; gap:8px;">
+          <button class="btn green" onclick="withdraw()">Withdraw</button>
+          <button class="btn" onclick="deposit()">Deposit</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h3>Transactions</h3>
+        <div id="txns"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<footer style="text-align:center; padding:16px; color:var(--muted); font-size:12px; border-top:1px solid var(--border);">© 2026 EarnHub. All rights reserved.</footer>
+
+<div id="withdrawModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Withdraw Funds</h3>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 8px;">Enter amount to withdraw to bank.</p>
+    <input type="number" id="wdAmt" placeholder="Min: KES 100 — Max: KES 70,000" min="100" max="70000" />
+    <div id="wdErr" style="color:var(--red); font-size:12px; margin-bottom:8px; display:none;">Amount must be between KES 100 and KES 70,000</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+      <button class="btn ghost" onclick="setAmt('wdAmt',100)">100</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',150)">150</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',200)">200</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',250)">250</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',500)">500</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',1000)">1000</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',2000)">2000</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',5000)">5000</button>
+      <button class="btn ghost" onclick="setAmt('wdAmt',10000)">10000</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeWithdraw()">Cancel</button>
+      <button class="btn green" onclick="confirmWithdraw()">Withdraw</button>
+    </div>
+  </div>
+</div>
+
+<div id="wdSuccess" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">✅</div>
+    <h3>Withdrawal Successful</h3>
+    <div class="info" id="wdInfo"></div>
+    <button class="btn green" onclick="closeWdSuccess()">Okay</button>
+  </div>
+</div>
+
+<div id="cdOverlay" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">⏳</div>
+    <h3>Reward Already Claimed</h3>
+    <p>No reward for this view — you already claimed it. You can still watch the video.</p>
+    <p>Next reward available in:</p>
+    <div class="info" id="cdInfo"></div>
+    <button class="btn gold" onclick="closeCdOverlay(true)">Okay</button>
+  </div>
+</div>
+
+<div id="depSuccess" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <h3 id="depTitle">Deposit Pending</h3>
+    <div class="info" id="depInfo"></div>
+    <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+      <a id="depWa" class="btn green" target="_blank" style="display:inline-flex; align-items:center; justify-content:center; padding:10px 16px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+      <button class="btn" onclick="closeDepSuccess()">Okay</button>
+    </div>
+  </div>
+</div>
+
+<div id="methodOverlay" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">💸</div>
+    <h3>Withdraw As</h3>
+    <p>Choose how you want to receive funds.</p>
+    <div style="display:flex; gap:10px; justify-content:center; margin:16px 0;">
+      <button class="btn" onclick="chooseMethod('Airtime')">Airtime</button>
+      <button class="btn green" onclick="chooseMethod('M-Pesa')">M-Pesa</button>
+    </div>
+  </div>
+</div>
+<div id="phoneOverlay" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">📱</div>
+    <h3>Enter Phone Number</h3>
+    <input type="tel" id="phoneAmt" placeholder="e.g. 0712345678" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
+    <button class="btn green" onclick="confirmPhone()">Confirm</button>
+  </div>
+</div>
+
+<div id="depMethodOverlay" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">💳</div>
+    <h3>Deposit From</h3>
+    <p>Choose deposit source.</p>
+    <div id="depMethodErr" style="color:var(--red); font-size:12px; margin-bottom:8px; display:none;">Insufficient bonus. Use M-Pesa.</div>
+    <div style="display:flex; gap:10px; justify-content:center; margin:16px 0;">
+      <button class="btn" onclick="chooseDepMethod('M-Pesa')">M-Pesa</button>
+      <button class="btn gold" onclick="chooseDepMethod('Bonus')">Bonus</button>
+    </div>
+  </div>
+</div>
+<div id="depPhoneOverlay" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">📱</div>
+    <h3>Enter Phone Number</h3>
+    <input type="tel" id="depPhone" placeholder="e.g. 0712345678" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
+    <button class="btn green" onclick="confirmDepPhone()">Confirm</button>
+  </div>
+</div>
+
+<div id="refSuccess" class="overlay hidden">
+  <div class="overlay-box" style="position:relative;">
+    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:absolute;top:8px;right:12px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    <div class="big">🎉</div>
+    <h3>Referral Bonus Awarded</h3>
+    <p>KES 50.00 has been added to your bonus.</p>
+    <button class="btn green" onclick="document.getElementById('refSuccess').classList.add('hidden')">Okay</button>
+  </div>
+</div>
+
+<div id="depositModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Deposit Funds</h3>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 8px;">Enter amount to add to your wallet.</p>
+    <input type="number" id="depAmt" placeholder="Min: KES 100 — Max: KES 70,000" min="100" max="70000" />
+    <div id="depErr" style="color:var(--red); font-size:12px; margin-bottom:8px; display:none;">Amount must be between KES 100 and KES 70,000</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+      <button class="btn ghost" onclick="setAmt('depAmt',100)">100</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',150)">150</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',200)">200</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',250)">250</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',500)">500</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',1000)">1000</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',2000)">2000</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',5000)">5000</button>
+      <button class="btn ghost" onclick="setAmt('depAmt',10000)">10000</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeDeposit()">Cancel</button>
+      <button class="btn green" onclick="confirmDeposit()">Deposit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let balance = 0, tasks = 0, refs = 0, total = 0, bonus = 0, totalWithdrawn = 0;
+  const txns = [];
+  const activity = [];
+  try { const s = JSON.parse(localStorage.getItem('earnhub')||'{}'); balance=s.balance||0; tasks=s.tasks||0; refs=s.refs||0; total=s.total||0; bonus=s.bonus||0; totalWithdrawn=s.totalWithdrawn||0; if(s.txns) txns.push(...s.txns); if(s.activity) activity.push(...s.activity); } catch(e){}
+
+  function money(n){ return 'KES ' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function saveState(){ localStorage.setItem('earnhub', JSON.stringify({balance,tasks,refs,total,bonus,totalWithdrawn,txns,activity})); }
+  function updateUI(){
+    document.getElementById('walletPill').textContent = money(balance);
+    document.getElementById('statBalance').innerHTML = money(balance) + '<small>Wallet balance</small>';
+    document.getElementById('statTasks').innerHTML = tasks + '<small>Tasks completed</small>';
+    document.getElementById('statRef').innerHTML = refs + '<small>Friends referred</small>';
+    document.getElementById('wBal').textContent = money(balance);
+    document.getElementById('wTotal').textContent = money(total);
+    const ww = document.getElementById('wWithdrawn'); if (ww) ww.textContent = money(totalWithdrawn);
+    const bb = document.getElementById('bonusBal'); if (bb) bb.textContent = money(bonus);
+    renderTxns(); renderActivity(); saveState();
+  }
+  function reward(amount, label){
+    balance += amount; total += amount; tasks++;
+    txns.unshift({label, amount, time: new Date().toLocaleTimeString()});
+    activity.unshift(label + ' — ' + money(amount));
+    if (activity.length > 8) activity.pop();
+    toast('+' + money(amount) + ' earned!');
+    updateUI();
+  }
+  function renderTxns(){
+    const el = document.getElementById('txns');
+    if (!txns.length){ el.innerHTML = '<p style="color:var(--muted)">No transactions yet.</p>'; return; }
+    el.innerHTML = txns.map(t => `<div class="wallet-row"><span>${t.label}<br><small style="color:var(--muted)">${t.time}</small></span><strong style="color:${t.amount>=0?'var(--green)':'var(--red)'}">${t.amount>=0?'+':''}${money(t.amount)}</strong></div>`).join('');
+  }
+  function renderActivity(){
+    const el = document.getElementById('activity');
+    if (!activity.length){ el.innerHTML = '<p style="color:var(--muted)">No activity yet. Start earning!</p>'; return; }
+    el.innerHTML = activity.map(a => {
+      const parts = a.split(' — ');
+      const neg = /lost|withdraw/i.test(parts[0]);
+      return `<div class="wallet-row"><span>${parts[0]}</span><strong style="color:${neg?'var(--red)':'var(--green)'}">${parts[1]||''}</strong></div>`;
+    }).join('');
+  }
+  function toast(msg){
+    const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+    document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
+  }
+  const titles = {home:'Dashboard', videos:'Watch Videos', surveys:'Surveys', dice:'Dice vs AI', refer:'Refer Friends', wallet:'Wallet', profile:'My Profile', contact:'Contact'};
+  const subs = {home:'Welcome back — start earning today.', videos:'Watch short clips for rewards.', surveys:'Share your opinion, get paid.', dice:'Beat the AI and win.', refer:'Invite friends, earn more.', wallet:'Manage your earnings.', profile:'Manage your addresses.', contact:'Get in touch.'};
+  function show(v){
+    document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+    document.getElementById(v).classList.remove('hidden');
+    document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active', a.dataset.view===v));
+    document.getElementById('title').textContent = titles[v];
+    document.getElementById('subtitle').textContent = subs[v];
+    if (v === 'surveys'){ const l=document.getElementById('surveyList'); const f1=document.getElementById('surveyForm1'); const f2=document.getElementById('surveyForm2'); if(l) l.classList.remove('hidden'); if(f1) f1.classList.add('hidden'); if(f2) f2.classList.add('hidden'); if (!canDo('lastSurvey')){ document.querySelectorAll('#surveyForm1 input[type="radio"]').forEach(r=>r.checked=false); localStorage.removeItem('surveyState'); } }
+    if (v !== 'dice'){ const b=document.getElementById('betAmt'); if(b) b.value=10; }
+    if (v === 'refer') refreshRef();
+  }
+  document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',()=>show(a.dataset.view)));
+
+  const COOLDOWN = 24*60*60*1000;
+  function canDo(key){ const last = localStorage.getItem(key); return !last || (Date.now()-+last) >= COOLDOWN; }
+  function stamp(key){ localStorage.setItem(key, Date.now()); }
+  let pendingCdUrl = null;
+  function watchVideo(url,key){
+    if (canDo(key)){
+      stamp(key); reward(10,'Watched short video'); window.open(url,'_blank');
+    } else {
+      const last = +localStorage.getItem(key);
+      const rem = (24*60*60*1000) - (Date.now()-last);
+      const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000);
+      document.getElementById('cdInfo').innerHTML = `<div><span>Time remaining</span><strong>${h}h ${m}m ${s}s</strong></div>`;
+      pendingCdUrl = url;
+      document.getElementById('cdOverlay').classList.remove('hidden');
+    }
+  }
+  function closeCdOverlay(go){
+    document.getElementById('cdOverlay').classList.add('hidden');
+    if (go && pendingCdUrl){ window.open(pendingCdUrl,'_blank'); pendingCdUrl=null; }
+  }
+  function openSurvey(n){
+    document.getElementById('surveyList').classList.add('hidden');
+    const f1 = document.getElementById('surveyForm1'); const f2 = document.getElementById('surveyForm2');
+    if (f1) f1.classList.add('hidden'); if (f2) f2.classList.add('hidden');
+    const f = document.getElementById('surveyForm'+n); if (f) f.classList.remove('hidden');
+    const key = n===1?'lastSurvey':'lastSurvey2';
+    if (!canDo(key)){ document.querySelectorAll('#surveyForm'+n+' input[type="radio"]').forEach(r=>r.checked=false); } 
+  }
+  function closeSurvey(){ document.getElementById('surveyForm1').classList.add('hidden'); document.getElementById('surveyForm2').classList.add('hidden'); document.getElementById('surveyList').classList.remove('hidden'); }
+  function saveSurveyState(){
+    const s = {};
+    ['q1','q2','q3'].forEach(q=>{ const r=document.querySelector('input[name="'+q+'"]:checked'); if (r) s[q]=r.value; });
+    localStorage.setItem('surveyState', JSON.stringify(s));
+  }
+  function loadSurveyState(){
+    try { const s=JSON.parse(localStorage.getItem('surveyState')||'{}'); Object.keys(s).forEach(q=>{ const r=document.querySelector('input[name="'+q+'"][value="'+s[q]+'"]'); if (r) r.checked=true; }); } catch(e){}
+  }
+  document.querySelectorAll('#surveyForm1 input[type="radio"]').forEach(r=>r.addEventListener('change', saveSurveyState));
+  function submitSurvey2(){
+    if (!canDo('lastSurvey2')){ toast('Already completed. Check timer for next reward.'); return; }
+    const q4=document.querySelector('input[name="q4"]:checked');
+    const q5=document.querySelector('input[name="q5"]:checked');
+    const q6=document.querySelector('input[name="q6"]:checked');
+    if (!q4||!q5||!q6){ toast('Please answer all questions'); return; }
+    stamp('lastSurvey2'); reward(50,'Completed survey'); closeSurvey();
+  }
+  function submitSurvey(){
+    if (!canDo('lastSurvey')){ toast('Already completed. Check timer for next reward.'); return; }
+    const q1=document.querySelector('input[name="q1"]:checked');
+    const q2=document.querySelector('input[name="q2"]:checked');
+    const q3=document.querySelector('input[name="q3"]:checked');
+    if (!q1||!q2||!q3){ toast('Please answer all questions'); return; }
+    stamp('lastSurvey'); reward(50,'Completed survey');
+    localStorage.removeItem('surveyState');
+    closeSurvey();
+  }
+  const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+  let rolling = false;
+  function rollDice(){
+    const bet = parseFloat(document.getElementById('betAmt').value);
+    if (!bet || bet < 10 || bet > 70000){ toast('Bet must be between KES 10 and KES 70,000'); return; }
+    if (bet > balance){ toast('Insufficient balance'); return; }
+    balance -= bet; updateUI();
+    if (rolling) { rolling = false; const b=document.getElementById('rollBtn'); if(b) b.disabled=false; }
+    rolling = true;
+    const ud = document.getElementById('userDice'); const ad = document.getElementById('aiDice');
+    ud.classList.add('rolling'); ad.classList.add('rolling');
+    const status = document.getElementById('diceStatus');
+    const result = document.getElementById('diceResult');
+    status.textContent = 'Rolling...';
+    result.textContent = '';
+    let ticks = 0;
+    const iv = setInterval(()=>{
+      try {
+        document.getElementById('userDice').textContent = faces[Math.floor(Math.random()*6)];
+        document.getElementById('aiDice').textContent = faces[Math.floor(Math.random()*6)];
+        ticks++;
+        if (ticks > 12){
+          clearInterval(iv);
+          const user = Math.floor(Math.random()*6)+1;
+          const ai = Math.floor(Math.random()*6)+1;
+          document.getElementById('userDice').textContent = faces[user-1];
+          document.getElementById('aiDice').textContent = faces[ai-1];
+          document.getElementById('userDice').classList.remove('rolling');
+          document.getElementById('aiDice').classList.remove('rolling');
+          if (user > ai){ status.textContent = 'Your turn result: Win!'; result.textContent = `You rolled ${user}, AI rolled ${ai} — You win ${money(bet*2)}!`; result.style.color='var(--green)'; balance += bet*2; total += bet; txns.unshift({label:'Won dice vs AI', amount:bet*2, time:new Date().toLocaleTimeString()}); activity.unshift('Won dice vs AI — ' + money(bet*2)); updateUI(); }
+          else if (user < ai){ status.textContent = 'AI wins this round'; result.textContent = `You rolled ${user}, AI rolled ${ai} — AI wins.`; result.style.color='var(--red)'; toast('Lost ' + money(bet)); txns.unshift({label:'Lost dice vs AI', amount:-bet, time:new Date().toLocaleTimeString()}); activity.unshift('Lost dice vs AI — ' + money(bet)); updateUI(); }
+          else { status.textContent = 'Tie'; result.textContent = `Tie (${user}). Bet refunded.`; result.style.color='var(--muted)'; balance += bet; updateUI(); }
+        }
+      } catch(e){ clearInterval(iv); rolling=false; btn.disabled=false; }
+    }, 80);
+    setTimeout(()=>{ rolling=false; btn.disabled=false; }, 1200);
+  }
+  function setAmt(id,n){ document.getElementById(id).value = n; }
+  function withdraw(){ document.getElementById('withdrawModal').classList.remove('hidden'); document.getElementById('wdAmt').focus(); document.getElementById('wdErr').style.display='none'; }
+  function closeWithdraw(){ document.getElementById('withdrawModal').classList.add('hidden'); document.getElementById('wdAmt').value=''; document.getElementById('wdErr').style.display='none'; }
+  let wdMethod='', wdAmtVal=0;
+  function confirmWithdraw(){
+    const amt = parseFloat(document.getElementById('wdAmt').value);
+    const err = document.getElementById('wdErr');
+    if (!amt || amt < 100 || amt > 70000){ err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }
+    if (amt > balance){ err.textContent='Insufficient balance'; err.style.display='block'; setTimeout(()=>{err.style.display='none'; err.textContent='Amount must be between KES 100 and KES 70,000';},5000); return; }
+    err.style.display='none';
+    wdAmtVal = amt;
+    closeWithdraw();
+    document.getElementById('methodOverlay').classList.remove('hidden');
+  }
+  function chooseMethod(m){
+    wdMethod = m;
+    document.getElementById('methodOverlay').classList.add('hidden');
+    document.getElementById('phoneOverlay').classList.remove('hidden');
+    const p = document.getElementById('phoneAmt'); if (p) p.value = localStorage.getItem('wdAddr')||'';
+  }
+  function confirmPhone(){
+    const phone = document.getElementById('phoneAmt').value.trim();
+    if (!phone){ toast('Enter phone number'); return; }
+    document.getElementById('phoneOverlay').classList.add('hidden');
+    balance -= wdAmtVal;
+    totalWithdrawn += wdAmtVal;
+    const now = new Date().toLocaleString();
+    txns.unshift({label:'Withdrawal ('+wdMethod+')', amount:-wdAmtVal, time:new Date().toLocaleTimeString()});
+    activity.unshift('Withdrawal — ' + money(wdAmtVal));
+    document.getElementById('wdInfo').innerHTML = `
+      <div><span>Amount</span><strong>${money(wdAmtVal)}</strong></div>
+      <div><span>Method</span><strong>${wdMethod}</strong></div>
+      <div><span>Phone</span><strong>${phone}</strong></div>
+      <div><span>Status</span><strong>Completed</strong></div>
+      <div><span>Date</span><strong>${now}</strong></div>
+    `;
+    document.getElementById('wdSuccess').classList.remove('hidden');
+    updateUI();
+  }
+  function closeWdSuccess(){ document.getElementById('wdSuccess').classList.add('hidden'); }
+  function deposit(){ document.getElementById('depositModal').classList.remove('hidden'); document.getElementById('depAmt').focus(); document.getElementById('depErr').style.display='none'; }
+  function closeDeposit(){ document.getElementById('depositModal').classList.add('hidden'); document.getElementById('depAmt').value=''; document.getElementById('depErr').style.display='none'; }
+  let depAmtVal=0;
+  function confirmDeposit(){
+    const amt = parseFloat(document.getElementById('depAmt').value);
+    const err = document.getElementById('depErr');
+    if (!amt || amt < 100 || amt > 70000){ err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }
+    err.style.display='none';
+    depAmtVal = amt;
+    closeDeposit();
+    document.getElementById('depMethodOverlay').classList.remove('hidden');
+  }
+  function chooseDepMethod(m){
+    document.getElementById('depMethodOverlay').classList.add('hidden');
+    if (m === 'Bonus'){
+      if (bonus < depAmtVal){ document.getElementById('depMethodErr').style.display='block'; setTimeout(()=>document.getElementById('depMethodErr').style.display='none',5000); document.getElementById('depMethodOverlay').classList.remove('hidden'); return; }
+      document.getElementById('depMethodErr').style.display='none';
+      bonus -= depAmtVal; balance += depAmtVal; total += depAmtVal;
+      txns.unshift({label:'Deposit (Bonus)', amount:depAmtVal, time:new Date().toLocaleTimeString()});
+      activity.unshift('Deposit — ' + money(depAmtVal));
+      document.getElementById('depTitle').textContent = 'Deposit Successful';
+      document.getElementById('depInfo').innerHTML = `<div><span>Amount</span><strong>${money(depAmtVal)}</strong></div><div><span>Source</span><strong>Bonus</strong></div><div><span>Status</span><strong>Completed</strong></div>`;
+      document.getElementById('depSuccess').classList.remove('hidden');
+      updateUI();
+      return;
+    }
+    document.getElementById('depPhoneOverlay').classList.remove('hidden');
+    const dp = document.getElementById('depPhone'); if (dp) dp.value = localStorage.getItem('depAddr')||'';
+  }
+  if (!localStorage.getItem('refId')) {
+    let c = parseInt(localStorage.getItem('refCounter')||'0') + 1;
+    localStorage.setItem('refCounter', c);
+    localStorage.setItem('refId', c);
+  }
+  function refreshRef(){
+    const id = localStorage.getItem('refId');
+    const el = document.getElementById('refId'); if (el) el.textContent = id;
+    const link = document.getElementById('refLink'); if (link) link.textContent = location.href.split('?')[0] + '?ref=' + id;
+  }
+  function claimReferral(){
+    const val = document.getElementById('refInput').value.trim();
+    const err = document.getElementById('refErr');
+    err.style.display='none';
+    if (!val){ err.textContent='Enter a referral ID'; err.style.display='block'; return; }
+    bonus += 50; updateUI();
+    toast('Bonus KES 50.00 awarded!');
+    const o = document.getElementById('refSuccess'); if (o) o.classList.remove('hidden');
+  }
+  function bindAddr(type){
+    const id = type==='wd'?'wdAddr':'depAddr';
+    const val = document.getElementById(id).value.trim();
+    if (!val){ toast('Enter number'); return; }
+    localStorage.setItem(type+'Addr', val);
+    toast('Bound');
+    loadProfile();
+  }
+  function changeAddr(type){
+    const id = type==='wd'?'wdAddr':'depAddr';
+    const el = document.getElementById(id);
+    el.disabled = false;
+    el.value = localStorage.getItem(type+'Addr')||'';
+    el.focus();
+  }
+  function loadProfile(){
+    const wd = localStorage.getItem('wdAddr'); if (wd){ document.getElementById('wdAddrShow').textContent='Bound: '+wd; document.getElementById('wdAddr').value=wd; document.getElementById('wdAddr').disabled=true; document.getElementById('wdChange').style.display='inline-block'; }
+    else { document.getElementById('wdAddrShow').textContent=''; document.getElementById('wdAddr').disabled=false; document.getElementById('wdChange').style.display='none'; }
+    const dep = localStorage.getItem('depAddr'); if (dep){ document.getElementById('depAddrShow').textContent='Bound: '+dep; document.getElementById('depAddr').value=dep; document.getElementById('depAddr').disabled=true; document.getElementById('depChange').style.display='inline-block'; }
+    else { document.getElementById('depAddrShow').textContent=''; document.getElementById('depAddr').disabled=false; document.getElementById('depChange').style.display='none'; }
+  }
+  loadProfile();
+  window.claimReferral = claimReferral;
+  window.refreshRef = refreshRef;
+  setInterval(refreshRef,1000);
+  function confirmDepPhone(){
+    const phone = document.getElementById('depPhone').value.trim();
+    if (!phone){ toast('Enter phone number'); return; }
+    document.getElementById('depPhoneOverlay').classList.add('hidden');
+    const msg = encodeURIComponent('Hello, I deposited KES '+Number(depAmtVal).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})+' via M-Pesa from '+phone+'. Please confirm.');
+    const wa = document.getElementById('depWa'); if (wa) wa.href = 'https://wa.me/254743733752?text='+msg;
+    document.getElementById('depTitle').textContent = 'Deposit Pending';
+    document.getElementById('depInfo').innerHTML = `<div><span>Amount</span><strong>${money(depAmtVal)}</strong></div><div><span>Source</span><strong>M-Pesa</strong></div><div><span>Phone</span><strong>${phone}</strong></div><div><span>Status</span><strong>Pending</strong></div><div><span></span><strong>Complete transaction on your phone or contact mentor if unable to get a prompt on your phone</strong></div>`;
+    document.getElementById('depSuccess').classList.remove('hidden');
+    updateUI();
+  }
+  function closeDepSuccess(){ document.getElementById('depSuccess').classList.add('hidden'); }
+  updateUI();
+  setInterval(()=>{
+    [['lastVideo1','vTimer1'],['lastVideo2','vTimer2'],['lastVideo3','vTimer3'],['lastVideo4','vTimer4'],['lastVideo5','vTimer5'],['lastVideo6','vTimer6'],['lastSurvey','sTimer'],['lastSurvey','sTimerList'],['lastSurvey2','sTimer2'],['lastSurvey2','sTimerList2']].forEach(([k,id])=>{
+      const last = localStorage.getItem(k);
+      const el = document.getElementById(id);
+      if (el) { if (!last){ el.textContent=''; } else { const rem = (24*60*60*1000) - (Date.now()-+last); if (rem <= 0){ el.textContent='Available now'; } else { const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000); el.textContent = `Next reward in ${h}h ${m}m ${s}s`; } } }
+      const el2 = document.getElementById('sTimerList'); if (el2 && id==='sTimer') { if (!last){ el2.textContent=''; } else { const rem = (24*60*60*1000) - (Date.now()-+last); if (rem <= 0){ el2.textContent='Available now'; } else { const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000); el2.textContent = `Next reward in ${h}h ${m}m ${s}s`; } } }
+    });
+  },1000);
+</script>
+</body>
+</html>
