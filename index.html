@@ -164,13 +164,6 @@
          <button class="btn gold" onclick="doSpin()">Spin</button>
        </div>
      </section>
-     <div id="spinWinOverlay" class="overlay hidden">
-       <div class="overlay-box" style="text-align:center;">
-         <h3>🎉 You Won!</h3>
-         <p style="font-size:24px;font-weight:800;margin:12px 0;color:#fff;"><strong id="spinPrize">+ KES 0.00</strong></p>
-         <button class="btn gold" onclick="document.getElementById('spinWinOverlay').classList.add('hidden')">Collect</button>
-       </div>
-     </div>
     <div class="topbar">
       <div>
         <h1 id="title">Dashboard</h1>
@@ -521,6 +514,13 @@
      </section>
    </main>
 </div>
+<div id="spinWinOverlay" class="overlay hidden">
+       <div class="overlay-box" style="text-align:center;">
+         <h3>🎉 You Won!</h3>
+         <p style="font-size:24px;font-weight:800;margin:12px 0;color:#fff;"><strong id="spinPrize">+ KES 0.00</strong></p>
+         <button class="btn gold" onclick="document.getElementById('spinWinOverlay').classList.add('hidden')">Collect</button>
+       </div>
+     </div>
 <div id="allActivityOverlay" class="overlay hidden">
   <div class="overlay-box" style="position:relative; display:flex; flex-direction:column; width:460px; max-height:70vh; overflow:auto;">
     <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
