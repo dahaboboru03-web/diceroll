@@ -140,6 +140,15 @@
       <a data-view="surveys">📋 Surveys</a>
        <a data-view="dice">🎲 Dice vs AI</a>
        <a data-view="spin">🎡 Spin</a>
+       <section id="spinView" class="view hidden">
+         <h2>Spin Wheel</h2>
+         <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+           <div id="spinWheel" style="width:200px;height:200px;border-radius:50%;background:conic-gradient(#fbbf24 0deg 60deg,#22d3ee 60deg 120deg,#a855f7 120deg 180deg,#22c55e 180deg 240deg,#ef4444 240deg 300deg,#3b82f6 300deg 360deg);border:4px solid #fff;position:relative;transition:transform 4s cubic-bezier(.17,.67,.12,.99);">
+             <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;">🎡</div>
+           </div>
+           <button class="btn gold" onclick="doSpin()">Spin</button>
+         </div>
+       </section>
       <a data-view="refer">👥 Refer Friends</a>
       <a data-view="profile">👤 My Profile</a>
       <a data-view="contact">📞 Contact</a>
@@ -764,7 +773,7 @@
   try { const s = JSON.parse(localStorage.getItem('earnhub')||'{}'); balance=s.balance||0; tasks=s.tasks||0; refs=(JSON.parse(localStorage.getItem('refHistory')||'[]')).length; total=s.total||0; bonus=s.bonus||0; totalWithdrawn=s.totalWithdrawn||0; BoosterpotPot=s.BoosterpotPot||0; BoosterpotTarget=s.BoosterpotTarget||0; rocketpotPot=s.rocketpotPot||0; rocketpotTarget=s.rocketpotTarget||0; if (!BoosterpotPot) BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2)); if (!BoosterpotTarget) BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2)); if (!rocketpotPot) rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); if (!rocketpotTarget) rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); if(s.txns) txns.push(...s.txns); if(s.activity) activity.push(...s.activity); if(s.BoosterpotWins) BoosterpotWins.push(...s.BoosterpotWins); if(s.jackpotWins) BoosterpotWins.push(...s.jackpotWins); if(s.rocketpotWins) rocketpotWins.push(...s.rocketpotWins); if(s.megaJackpotWins) rocketpotWins.push(...s.megaJackpotWins); if(s.donations) donations.push(...s.donations); } catch(e){ if(!BoosterpotPot) BoosterpotPot=parseFloat((1100+Math.random()*800).toFixed(2)); if(!BoosterpotTarget) BoosterpotTarget=parseFloat((6999.99+Math.random()*8142.01).toFixed(2)); if(!rocketpotPot) rocketpotPot=parseFloat((14000+Math.random()*15000).toFixed(2)); if(!rocketpotTarget) rocketpotTarget=parseFloat((100000+Math.random()*99999.99).toFixed(2)); }
 
   function money(n){ return 'KES ' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-   function saveState(){ localStorage.setItem('earnhub', JSON.stringify({balance,tasks,refs,total,bonus,totalWithdrawn,txns,activity,BoosterpotPot,BoosterpotTarget,rocketpotPot,rocketpotTarget,BoosterpotWins,rocketpotWins,donations})); }
+   function doSpin(){ const wheel=document.getElementById('spinWheel'); if(!wheel) return; const deg=360*5+Math.random()*360; wheel.style.transform='rotate('+deg+'deg)'; const prize=Math.floor(Math.random()*100001); setTimeout(()=>{ balance+=prize; saveState(); updateUI(); alert('You won KES '+prize.toLocaleString()); },4200); }
   function updateUI(){
     document.getElementById('walletPillAmt').textContent = money(balance);
     document.getElementById('statBalance').innerHTML = money(balance) + '<small>Wallet balance</small>';
@@ -804,7 +813,7 @@
     const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
     document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
   }
-  const titles = {home:'Dashboard', videos:'Watch Videos', surveys:'Surveys', dice:'Dice vs AI', refer:'Refer Friends', wallet:'Wallet', profile:'My Profile', contact:'Contact', notifications:'Notifications', redeem:'Redeem Voucher', rules:'Rules', donate:'Donate'};
+  const titles = {home:'Dashboard', videos:'Watch Videos', surveys:'Surveys', dice:'Dice vs AI', spin:'Spin', refer:'Refer Friends', wallet:'Wallet', profile:'My Profile', contact:'Contact', notifications:'Notifications', redeem:'Redeem Voucher', rules:'Rules', donate:'Donate'};
   const subs = {home:'Welcome back — start earning today.', videos:'Watch short clips for rewards.', surveys:'Share your opinion, get paid.', dice:'Beat the AI and win.', refer:'Invite friends, earn more.', wallet:'Manage your earnings.', profile:'Manage your addresses.', contact:'Get in touch.', notifications:'System notifications.', redeem:'Enter your voucher code.', rules:'Platform rules and guidelines.', donate:'Support a cause.'};
   function show(v){
     document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
