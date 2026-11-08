@@ -820,8 +820,7 @@
     document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
     document.getElementById(v).classList.remove('hidden');
     document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active', a.dataset.view===v));
-    document.getElementById('title').textContent = titles[v];
-    document.getElementById('subtitle').textContent = subs[v];
+    if (v !== 'spin'){ document.getElementById('title').textContent = titles[v]; document.getElementById('subtitle').textContent = subs[v]; }
     if (v === 'surveys'){ const l=document.getElementById('surveyList'); const f1=document.getElementById('surveyForm1'); const f2=document.getElementById('surveyForm2'); if(l) l.classList.remove('hidden'); if(f1) f1.classList.add('hidden'); if(f2) f2.classList.add('hidden'); if (!canDo('lastSurvey')){ document.querySelectorAll('#surveyForm1 input[type="radio"]').forEach(r=>r.checked=false); localStorage.removeItem('surveyState'); } }
     if (v !== 'dice'){ const b=document.getElementById('betAmt'); if(b) b.value=10; }
     if (v === 'refer') { refreshRef(); renderRefHistory(); }
