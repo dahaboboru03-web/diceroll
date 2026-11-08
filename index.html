@@ -140,16 +140,7 @@
       <a data-view="surveys">📋 Surveys</a>
        <a data-view="dice">🎲 Dice vs AI</a>
        <a data-view="spin">🎡 Spin</a>
-       <section id="spinView" class="view hidden">
-         <h2>Spin Wheel</h2>
-         <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
-           <div id="spinWheel" style="width:200px;height:200px;border-radius:50%;background:conic-gradient(#fbbf24 0deg 60deg,#22d3ee 60deg 120deg,#a855f7 120deg 180deg,#22c55e 180deg 240deg,#ef4444 240deg 300deg,#3b82f6 300deg 360deg);border:4px solid #fff;position:relative;transition:transform 4s cubic-bezier(.17,.67,.12,.99);">
-             <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;">🎡</div>
-           </div>
-           <button class="btn gold" onclick="doSpin()">Spin</button>
-         </div>
-       </section>
-      <a data-view="refer">👥 Refer Friends</a>
+       <a data-view="refer">👥 Refer Friends</a>
       <a data-view="profile">👤 My Profile</a>
       <a data-view="contact">📞 Contact</a>
       <a data-view="notifications">🔔 Notifications</a>
@@ -158,6 +149,15 @@
       <a data-view="donate">❤️ Donate</a>
       <a data-view="wallet">💰 Wallet</a>
     </nav>
+     <section id="spinView" class="view hidden">
+       <h2>Spin Wheel</h2>
+       <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+         <div id="spinWheel" style="width:200px;height:200px;border-radius:50%;background:conic-gradient(#fbbf24 0deg 60deg,#22d3ee 60deg 120deg,#a855f7 120deg 180deg,#22c55e 180deg 240deg,#ef4444 240deg 300deg,#3b82f6 300deg 360deg);border:4px solid #fff;position:relative;transition:transform 4s cubic-bezier(.17,.67,.12,.99);">
+           <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;">🎡</div>
+         </div>
+         <button class="btn gold" onclick="doSpin()">Spin</button>
+       </div>
+     </section>
     <div style="margin-top:24px; font-size:12px; color:var(--muted);">
       Earn points, redeem anytime.
     </div>
