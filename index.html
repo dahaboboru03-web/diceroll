@@ -214,7 +214,7 @@
         </div>
       </div>
 
-      <input type="number" id="betAmt" class="bet-input" placeholder="Bet amount (KES)" min="10" max="70000" value="100" />
+      <input type="number" id="betAmt" class="bet-input" placeholder="Bet amount (KES)" min="10" max="1000000" value="100" />
       
       <div class="quick-bets">
         <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 10)">10</button>
@@ -226,7 +226,7 @@
         <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 1000)">1K</button>
         <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 5000)">5K</button>
         <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 10000)">10K</button>
-        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 70000)">Max</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 1000000)">Max</button>
       </div>
 
       <div class="dice-area">
@@ -535,7 +535,7 @@ function money(n) {
 
 function updateUI() {
   document.getElementById('walletPill').textContent = money(balance);
-  document.getElementById('betAmt').max = Math.min(70000, balance);
+  document.getElementById('betAmt').max = Math.min(1000000, balance);
   
   // Wallet view
   const wb = document.getElementById('walletBalance');
@@ -594,7 +594,7 @@ function closeOverlay(id) {
 // ===== DICE GAME LOGIC =====
 function rollDice() {
   const bet = parseFloat(document.getElementById('betAmt').value);
-  if (!bet || bet < 10 || bet > 70000) { toast('Bet must be between KES 10 and KES 70,000'); return; }
+  if (!bet || bet < 10 || bet > 1000000) { toast('Bet must be between KES 10 and KES 1,000,000'); return; }
   if (bet > balance) { toast('Insufficient balance'); return; }
   if (rolling) return;
 
