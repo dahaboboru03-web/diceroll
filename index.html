@@ -301,8 +301,9 @@
          <h3>Roll Dice vs AI</h3>
          <p>Enter your bet amount. Win pays 2x your bet.</p>
          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
-           <div onclick="showSinglePotHistory('Boosterpot')" style="cursor:pointer; padding:8px 10px; border:1px solid var(--gold); border-radius:10px; color:var(--gold); font-weight:700; text-align:center; font-size:13px;">🏆 Boosterpot<br>KES <span id="BoosterpotPot">0.00</span></div>
-           <div onclick="showSinglePotHistory('Rocketpot')" style="cursor:pointer; padding:8px 10px; border:1px solid #a855f7; border-radius:10px; color:#a855f7; font-weight:700; text-align:center; font-size:13px;">💎 Rocketpot<br>KES <span id="rocketpotPot">0.00</span></div>
+            <div onclick="showSinglePotHistory('Boosterpot')" style="cursor:pointer; padding:8px 10px; border:1px solid var(--gold); border-radius:10px; color:var(--gold); font-weight:700; text-align:center; font-size:13px;">🏆 Boosterpot<br>KES <span id="BoosterpotPot">0.00</span></div>
+            <div onclick="showSinglePotHistory('Rocketpot')" style="cursor:pointer; padding:8px 10px; border:1px solid #a855f7; border-radius:10px; color:#a855f7; font-weight:700; text-align:center; font-size:13px;">💎 Rocketpot<br>KES <span id="rocketpotPot">0.00</span></div>
+            <div onclick="showSinglePotHistory('Grand Jackpot')" style="cursor:pointer; padding:8px 10px; border:1px solid #ef4444; border-radius:10px; color:#ef4444; font-weight:700; text-align:center; font-size:13px;">💎 Grand Jackpot<br>KES <span id="grandJackpotPot">0.00</span></div>
          </div>
          <button class="btn ghost" style="margin-top:8px;" onclick="showBoosterpotHistory()">View Won Pots</button>
         <input type="number" id="betAmt" placeholder="Bet amount (KES)" min="10" max="70000" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
@@ -566,6 +567,15 @@
     <button class="btn gold" style="align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Collect Win</button>
   </div>
 </div>
+<div id="grandJackpotOverlay" class="overlay hidden">
+  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
+    <div class="big">💎</div>
+    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">YOU HAVE WON</h3>
+    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">GRAND JACKPOT !</h3>
+    <p style="font-size:26px; font-weight:900; margin:12px 0; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);"><strong id="grandJackpotPrize">+ KES 0.00</strong></p>
+    <button class="btn gold" style="align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Collect Win</button>
+  </div>
+</div>
 <div id="BoosterpotHistoryOverlay" class="overlay hidden">
   <div class="overlay-box" style="position:relative; display:flex; flex-direction:column; width:560px; max-height:75vh; overflow:auto;">
     <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
@@ -578,6 +588,10 @@
       <div style="background:var(--card2); border-radius:12px; padding:12px;">
         <div style="font-weight:800; color:#a855f7; margin-bottom:8px; text-align:center;">Rocketpot</div>
         <div id="rocketpotWinsList"></div>
+      </div>
+      <div style="background:var(--card2); border-radius:12px; padding:12px;">
+        <div style="font-weight:800; color:#ef4444; margin-bottom:8px; text-align:center;">Grand Jackpot</div>
+        <div id="grandJackpotWinsList"></div>
       </div>
     </div>
   </div>
@@ -754,16 +768,17 @@
 </div>
 
 <script>
-   let balance = 0, tasks = 0, refs = 0, total = 0, bonus = 0, totalWithdrawn = 0, BoosterpotPot = 0, BoosterpotTarget = 0, rocketpotPot = 0, rocketpotTarget = 0;
+    let balance = 0, tasks = 0, refs = 0, total = 0, bonus = 0, totalWithdrawn = 0, BoosterpotPot = 0, BoosterpotTarget = 0, rocketpotPot = 0, rocketpotTarget = 0, grandJackpotPot = 0, grandJackpotTarget = 0;
    const txns = [];
    const activity = [];
    const BoosterpotWins = [];
-   const rocketpotWins = [];
+    const rocketpotWins = [];
+    const grandJackpotWins = [];
    const donations = [];
-  try { const s = JSON.parse(localStorage.getItem('earnhub')||'{}'); balance=s.balance||0; tasks=s.tasks||0; refs=(JSON.parse(localStorage.getItem('refHistory')||'[]')).length; total=s.total||0; bonus=s.bonus||0; totalWithdrawn=s.totalWithdrawn||0; BoosterpotPot=s.BoosterpotPot||0; BoosterpotTarget=s.BoosterpotTarget||0; rocketpotPot=s.rocketpotPot||0; rocketpotTarget=s.rocketpotTarget||0; if (!BoosterpotPot) BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2)); if (!BoosterpotTarget) BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2)); if (!rocketpotPot) rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); if (!rocketpotTarget) rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); if(s.txns) txns.push(...s.txns); if(s.activity) activity.push(...s.activity); if(s.BoosterpotWins) BoosterpotWins.push(...s.BoosterpotWins); if(s.jackpotWins) BoosterpotWins.push(...s.jackpotWins); if(s.rocketpotWins) rocketpotWins.push(...s.rocketpotWins); if(s.megaJackpotWins) rocketpotWins.push(...s.megaJackpotWins); if(s.donations) donations.push(...s.donations); } catch(e){ if(!BoosterpotPot) BoosterpotPot=parseFloat((1100+Math.random()*800).toFixed(2)); if(!BoosterpotTarget) BoosterpotTarget=parseFloat((6999.99+Math.random()*8142.01).toFixed(2)); if(!rocketpotPot) rocketpotPot=parseFloat((14000+Math.random()*15000).toFixed(2)); if(!rocketpotTarget) rocketpotTarget=parseFloat((100000+Math.random()*99999.99).toFixed(2)); }
+   try { const s = JSON.parse(localStorage.getItem('earnhub')||'{}'); balance=s.balance||0; tasks=s.tasks||0; refs=(JSON.parse(localStorage.getItem('refHistory')||'[]')).length; total=s.total||0; bonus=s.bonus||0; totalWithdrawn=s.totalWithdrawn||0; BoosterpotPot=s.BoosterpotPot||0; BoosterpotTarget=s.BoosterpotTarget||0; rocketpotPot=s.rocketpotPot||0; rocketpotTarget=s.rocketpotTarget||0; grandJackpotPot=s.grandJackpotPot||0; grandJackpotTarget=s.grandJackpotTarget||0; if (!BoosterpotPot) BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2)); if (!BoosterpotTarget) BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2)); if (!rocketpotPot) rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); if (!rocketpotTarget) rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); if (!grandJackpotPot) grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2)); if (!grandJackpotTarget) grandJackpotTarget = parseFloat((1000000 + Math.random()*99000000).toFixed(2)); if(s.txns) txns.push(...s.txns); if(s.activity) activity.push(...s.activity); if(s.BoosterpotWins) BoosterpotWins.push(...s.BoosterpotWins); if(s.jackpotWins) BoosterpotWins.push(...s.jackpotWins); if(s.rocketpotWins) rocketpotWins.push(...s.rocketpotWins); if(s.megaJackpotWins) rocketpotWins.push(...s.megaJackpotWins); if(s.grandJackpotWins) grandJackpotWins.push(...s.grandJackpotWins); if(s.donations) donations.push(...s.donations); } catch(e){ if(!BoosterpotPot) BoosterpotPot=parseFloat((1100+Math.random()*800).toFixed(2)); if(!BoosterpotTarget) BoosterpotTarget=parseFloat((6999.99+Math.random()*8142.01).toFixed(2)); if(!rocketpotPot) rocketpotPot=parseFloat((14000+Math.random()*15000).toFixed(2)); if(!rocketpotTarget) rocketpotTarget=parseFloat((100000+Math.random()*99999.99).toFixed(2)); if(!grandJackpotPot) grandJackpotPot=parseFloat((10000+Math.random()*15000).toFixed(2)); if(!grandJackpotTarget) grandJackpotTarget=parseFloat((1000000+Math.random()*99000000).toFixed(2)); }
 
   function money(n){ return 'KES ' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-   function saveState(){ localStorage.setItem('earnhub', JSON.stringify({balance,tasks,refs,total,bonus,totalWithdrawn,txns,activity,BoosterpotPot,BoosterpotTarget,rocketpotPot,rocketpotTarget,BoosterpotWins,rocketpotWins,donations})); }
+    function saveState(){ localStorage.setItem('earnhub', JSON.stringify({balance,tasks,refs,total,bonus,totalWithdrawn,txns,activity,BoosterpotPot,BoosterpotTarget,rocketpotPot,rocketpotTarget,grandJackpotPot,grandJackpotTarget,BoosterpotWins,rocketpotWins,grandJackpotWins,donations})); }
   function updateUI(){
     document.getElementById('walletPillAmt').textContent = money(balance);
     document.getElementById('statBalance').innerHTML = money(balance) + '<small>Wallet balance</small>';
@@ -886,9 +901,12 @@
     if (bet > balance){ toast('Insufficient balance'); return; }
      balance -= bet; updateUI();
      BoosterpotPot += bet * 0.0121;
-     rocketpotPot += bet * 0.0676;
-     updateBoosterpotUI();
-     updaterocketpotUI();
+      rocketpotPot += bet * 0.0676;
+      grandJackpotPot += bet * 0.714236989;
+   updateBoosterpotUI();
+   updaterocketpotUI();
+   updateGrandJackpotUI();
+      updateGrandJackpotUI();
      if (rolling) { rolling = false; const b=document.getElementById('rollBtn'); if(b) b.disabled=false; }
     rolling = true;
     const ud = document.getElementById('userDice'); const ad = document.getElementById('aiDice');
@@ -915,21 +933,24 @@
           else if (user < ai){ status.textContent = 'AI wins this round'; result.textContent = `You rolled ${user}, AI rolled ${ai} — AI wins.`; result.style.color='var(--red)'; toast('Lost ' + money(bet)); txns.unshift({label:'Lost dice vs AI', amount:-bet, time:new Date().toLocaleTimeString()}); activity.unshift('Lost dice vs AI — ' + money(bet)); updateUI(); }
            else { status.textContent = 'Tie'; result.textContent = `Tie (${user}). Bet refunded.`; result.style.color='var(--muted)'; balance += bet; updateUI(); }
            if (BoosterpotPot >= BoosterpotTarget){ const prize=BoosterpotTarget; balance += prize; BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2)); BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2)); txns.unshift({label:'Boosterpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Boosterpot won — ' + money(prize)); BoosterpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updateBoosterpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('BoosterpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('BoosterpotOverlay').classList.remove('hidden'); }
-           if (rocketpotPot >= rocketpotTarget){ const prize=rocketpotTarget; balance += prize; rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); txns.unshift({label:'Rocketpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Rocketpot won — ' + money(prize)); rocketpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updaterocketpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('rocketpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('rocketpotOverlay').classList.remove('hidden'); }
+            if (rocketpotPot >= rocketpotTarget){ const prize=rocketpotTarget; balance += prize; rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); txns.unshift({label:'Rocketpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Rocketpot won — ' + money(prize)); rocketpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updaterocketpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('rocketpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('rocketpotOverlay').classList.remove('hidden'); }
+            if (grandJackpotPot >= grandJackpotTarget){ const prize=grandJackpotTarget; balance += prize; grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2)); grandJackpotTarget = parseFloat((1000000 + Math.random()*99000000).toFixed(2)); txns.unshift({label:'Grand Jackpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Grand Jackpot won — ' + money(prize)); grandJackpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updateGrandJackpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('grandJackpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('grandJackpotOverlay').classList.remove('hidden'); }
          }
       } catch(e){ clearInterval(iv); rolling=false; btn.disabled=false; }
     }, 80);
     setTimeout(()=>{ rolling=false; btn.disabled=false; }, 1200);
   }
   function updateBoosterpotUI(){ const p=document.getElementById('BoosterpotPot'); if(p) p.textContent=BoosterpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  function updaterocketpotUI(){ const p=document.getElementById('rocketpotPot'); if(p) p.textContent=rocketpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  function showBoosterpotHistory(){
-    const j=document.getElementById('BoosterpotWinsList'); const m=document.getElementById('rocketpotWinsList');
-    if(j) j.innerHTML = BoosterpotWins.length? BoosterpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
-    if(m) m.innerHTML = rocketpotWins.length? rocketpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
-    document.getElementById('BoosterpotHistoryOverlay').classList.remove('hidden');
-  }
-  function showSinglePotHistory(type){ const title=document.getElementById('singlePotTitle'); const list=document.getElementById('singlePotList'); if(!list) return; const isBoosterpot = type==='Boosterpot'; const wins = (isBoosterpot? BoosterpotWins : rocketpotWins).slice(0,5); const color = isBoosterpot? 'var(--gold)' : '#a855f7'; const name = isBoosterpot? 'Boosterpot' : 'Rocketpot'; if(title) title.textContent = '🏆 ' + name + ' History'; list.innerHTML = wins.length? `<div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; font-weight:700; padding:8px 0; border-bottom:1px solid var(--border);"><div>Amount</div><div>Time</div></div>` + wins.map(w=>`<div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; padding:8px 0; border-bottom:1px solid var(--border);"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:13px; color:var(--text); font-weight:600;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">No wins yet.</p>'; document.getElementById('singlePotOverlay').classList.remove('hidden'); }
+   function updaterocketpotUI(){ const p=document.getElementById('rocketpotPot'); if(p) p.textContent=rocketpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+   function updateGrandJackpotUI(){ const p=document.getElementById('grandJackpotPot'); if(p) p.textContent=grandJackpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+   function showBoosterpotHistory(){
+     const j=document.getElementById('BoosterpotWinsList'); const m=document.getElementById('rocketpotWinsList'); const g=document.getElementById('grandJackpotWinsList');
+     if(j) j.innerHTML = BoosterpotWins.length? BoosterpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
+     if(m) m.innerHTML = rocketpotWins.length? rocketpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
+     if(g) g.innerHTML = grandJackpotWins.length? grandJackpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
+     document.getElementById('BoosterpotHistoryOverlay').classList.remove('hidden');
+   }
+   function showSinglePotHistory(type){ const title=document.getElementById('singlePotTitle'); const list=document.getElementById('singlePotList'); if(!list) return; const isBoosterpot = type==='Boosterpot'; const isRocketpot = type==='Rocketpot'; const wins = (isBoosterpot? BoosterpotWins : isRocketpot? rocketpotWins : grandJackpotWins).slice(0,5); const color = isBoosterpot? 'var(--gold)' : isRocketpot? '#a855f7' : '#ef4444'; const name = isBoosterpot? 'Boosterpot' : isRocketpot? 'Rocketpot' : 'Grand Jackpot'; if(title) title.textContent = '🏆 ' + name + ' History'; list.innerHTML = wins.length? `<div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; font-weight:700; padding:8px 0; border-bottom:1px solid var(--border);"><div>Amount</div><div>Time</div></div>` + wins.map(w=>`<div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; padding:8px 0; border-bottom:1px solid var(--border);"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:13px; color:var(--text); font-weight:600;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">No wins yet.</p>'; document.getElementById('singlePotOverlay').classList.remove('hidden'); }
   function setAmt(id,n){ const el=document.getElementById(id); if(el) el.value=n; }
   function toggleTheme(){ const b=document.body; const light=b.classList.toggle('light'); localStorage.setItem('theme', light?'light':'dark'); document.getElementById('themeToggle').textContent = light?'☀️ Light':'🌙 Dark'; }
   (function(){ if (localStorage.getItem('theme')==='light'){ document.body.classList.add('light'); const t=document.getElementById('themeToggle'); if(t) t.textContent='☀️ Light'; } })();
