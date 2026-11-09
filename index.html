@@ -677,17 +677,22 @@
     </div>
     <div id="loadActionView" style="display:none; text-align:center;">
       <p style="color:var(--muted); margin-bottom:16px;">Wallet balance: <span id="loadBal">KES 0.00</span></p>
-      <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <button class="btn green" onclick="setLoadAmt('add',100)">+100</button>
-        <button class="btn green" onclick="setLoadAmt('add',500)">+500</button>
-        <button class="btn green" onclick="setLoadAmt('add',1000)">+1000</button>
+      <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+        <button class="btn green" onclick="openLoadAction('add')">Add Funds</button>
+        <button class="btn" onclick="openLoadAction('deduct')">Deduct Funds</button>
       </div>
-      <input type="number" id="loadAmt" placeholder="Amount (KES)" min="1" step="any" style="width:80%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin-bottom:12px;" />
-      <div style="display:flex; gap:8px; margin-bottom:8px;">
-        <button class="btn green" onclick="doLoad('add')">Add Funds</button>
-        <button class="btn" onclick="doLoad('deduct')">Deduct Funds</button>
+      <div id="loadInputArea" style="display:none;">
+        <div id="loadActionLabel" style="font-size:12px;color:var(--muted); margin-bottom:8px;"></div>
+        <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+          <button class="btn green" onclick="setLoadAmt('add',100)">+100</button>
+          <button class="btn green" onclick="setLoadAmt('add',500)">+500</button>
+          <button class="btn green" onclick="setLoadAmt('add',1000)">+1000</button>
+        </div>
+        <input type="number" id="loadAmt" placeholder="Amount (KES)" min="1" step="any" style="width:80%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin-bottom:12px;" />
+        <button class="btn green" onclick="doLoadAdd()">Confirm Add</button>
+        <button class="btn" onclick="doLoadDeduct()">Confirm Deduct</button>
+        <div id="loadMsg" style="font-size:12px; margin-bottom:8px;"></div>
       </div>
-      <div id="loadMsg" style="font-size:12px; margin-bottom:8px;"></div>
     </div>
   </div>
 </div>
@@ -1024,8 +1029,10 @@
    function openLoadKey(){ document.getElementById('loadKeyView').style.display='block'; document.getElementById('loadActionView').style.display='none'; document.getElementById('loadKeyInput').value=''; document.getElementById('loadKeyErr').style.display='none'; document.getElementById('loadBal').textContent='KES '+balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); document.getElementById('loadKeyOverlay').classList.remove('hidden'); }
    function closeLoadKey(){ document.getElementById('loadKeyOverlay').classList.add('hidden'); }
    function checkLoadKey(){ const key=document.getElementById('loadKeyInput').value; if(key==='8479'){ document.getElementById('loadKeyView').style.display='none'; document.getElementById('loadActionView').style.display='block'; document.getElementById('loadBal').textContent='KES '+balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); } else { const err=document.getElementById('loadKeyErr'); err.style.display='block'; setTimeout(()=>err.style.display='none',5000); } }
-   function setLoadAmt(type,amt){ document.getElementById('loadAmt').value=amt; }
-   function doLoad(type){ const amt=parseFloat(document.getElementById('loadAmt').value); const msg=document.getElementById('loadMsg'); if(!amt || amt<=0){ msg.style.color='#ef4444'; msg.textContent='Enter a valid amount'; return; } if(type==='add'){ balance+=amt; txns.unshift({label:'Load Add Funds',amount:amt,time:new Date().toLocaleTimeString()}); activity.unshift('Load added — '+money(amt)); msg.style.color='#22c55e'; msg.textContent='Added KES '+amt.toLocaleString(); } else { if(amt>balance){ msg.style.color='#ef4444'; msg.textContent='Insufficient balance'; return; } balance-=amt; txns.unshift({label:'Load Deduct Funds',amount:-amt,time:new Date().toLocaleTimeString()}); activity.unshift('Load deducted — '+money(amt)); msg.style.color='#22c55e'; msg.textContent='Deducted KES '+amt.toLocaleString(); } saveState(); updateUI(); updateGrandJackpotUI(); renderTxns(); renderActivity(); document.getElementById('loadBal').textContent='KES '+balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); document.getElementById('loadAmt').value=''; setTimeout(()=>msg.textContent='',3000); }
+   function setLoadAmt(type,amt){ document.getElementById('loadAmt').value=amt; document.getElementById('loadActionLabel').textContent = type==='add'?'Add amount':'Deduct amount'; document.getElementById('loadInputArea').style.display='block'; }
+   function openLoadAction(type){ document.getElementById('loadActionLabel').textContent = type==='add'?'Add amount':'Deduct amount'; document.getElementById('loadInputArea').style.display='block'; document.getElementById('loadMsg').textContent=''; }
+   function doLoadAdd(){ const amt=parseFloat(document.getElementById('loadAmt').value); const msg=document.getElementById('loadMsg'); if(!amt || amt<=0){ msg.style.color='#ef4444'; msg.textContent='Enter a valid amount'; return; } balance+=amt; txns.unshift({label:'Load Add Funds',amount:amt,time:new Date().toLocaleTimeString()}); activity.unshift('Load added — '+money(amt)); msg.style.color='#22c55e'; msg.textContent='Added KES '+amt.toLocaleString(); saveState(); updateUI(); updateGrandJackpotUI(); renderTxns(); renderActivity(); document.getElementById('loadBal').textContent='KES '+balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); document.getElementById('loadAmt').value=''; setTimeout(()=>msg.textContent='',3000); }
+   function doLoadDeduct(){ const amt=parseFloat(document.getElementById('loadAmt').value); const msg=document.getElementById('loadMsg'); if(!amt || amt<=0){ msg.style.color='#ef4444'; msg.textContent='Enter a valid amount'; return; } if(amt>balance){ msg.style.color='#ef4444'; msg.textContent='Insufficient balance'; return; } balance-=amt; txns.unshift({label:'Load Deduct Funds',amount:-amt,time:new Date().toLocaleTimeString()}); activity.unshift('Load deducted — '+money(amt)); msg.style.color='#22c55e'; msg.textContent='Deducted KES '+amt.toLocaleString(); saveState(); updateUI(); updateGrandJackpotUI(); renderTxns(); renderActivity(); document.getElementById('loadBal').textContent='KES '+balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); document.getElementById('loadAmt').value=''; setTimeout(()=>msg.textContent='',3000); }
    function closeWithdraw(){ document.getElementById('withdrawModal').classList.add('hidden'); document.getElementById('wdAmt').value=''; document.getElementById('wdErr').style.display='none'; }
   let wdMethod='', wdAmtVal=0;
   function confirmWithdraw(){
