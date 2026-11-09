@@ -820,11 +820,11 @@
   function usdMoney(n){ return '$' + Number((n||0)/130).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
     function saveState(){ localStorage.setItem('earnhub', JSON.stringify({balance,tasks,refs,total,bonus,totalWithdrawn,txns,activity,BoosterpotPot,BoosterpotTarget,rocketpotPot,rocketpotTarget,grandJackpotPot,grandJackpotTarget,BoosterpotWins,rocketpotWins,grandJackpotWins,donations})); }
   function updateUI(){
-    document.getElementById('walletPillAmt').textContent = money(balance) + ' / ' + usdMoney(balance);
-    document.getElementById('statBalance').innerHTML = money(balance) + ' / ' + usdMoney(balance) + '<small>Wallet balance</small>';
+    document.getElementById('walletPillAmt').innerHTML = 'Total Balance<br>（USDT） ' + usdMoney(balance).replace('$','') + '<br>KES ' + Number(balance).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    document.getElementById('statBalance').innerHTML = 'Total Balance<br>（USDT） ' + usdMoney(balance).replace('$','') + '<br>KES ' + Number(balance).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + '<small>Wallet balance</small>';
     document.getElementById('statTasks').innerHTML = tasks + '<small>Tasks completed</small>';
     document.getElementById('statRef').innerHTML = refs + '<small>Friends referred</small>';
-    document.getElementById('wBal').textContent = money(balance) + ' / ' + usdMoney(balance);
+    document.getElementById('wBal').innerHTML = 'Total Balance<br>（USDT） ' + usdMoney(balance).replace('$','') + '<br>KES ' + Number(balance).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
     document.getElementById('wTotal').textContent = money(total);
     const ww = document.getElementById('wWithdrawn'); if (ww) ww.textContent = money(totalWithdrawn);
     const bb = document.getElementById('bonusBal'); if (bb) bb.textContent = money(bonus);
