@@ -146,6 +146,7 @@
       <a data-view="redeem">🎁 Redeem Voucher</a>
       <a data-view="rules">📜 Rules</a>
       <a data-view="donate">❤️ Donate</a>
+      <a data-view="wins">🏆 Wins</a>
       <a data-view="wallet">💰 Wallet</a>
     </nav>
     <div style="margin-top:24px; font-size:12px; color:var(--muted);">
@@ -175,7 +176,44 @@
       </div>
     </section>
 
-    <!-- VIDEOS -->
+    <!-- WINS -->
+    <section id="wins" class="hidden">
+      <h2 style="margin-bottom:16px; text-align:center;">🏆 Pot Wins</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:16px;">
+        <div class="card" style="text-align:center; cursor:pointer;" onclick="showPotStat('Boosterpot')">
+          <div style="font-weight:800; color:var(--gold); margin-bottom:4px;">🏆 Boosterpot</div>
+          <div style="font-size:16px; color:var(--text);" id="winsBoosterpotVal">KES 0.00</div>
+        </div>
+        <div class="card" style="text-align:center; cursor:pointer;" onclick="showPotStat('Rocketpot')">
+          <div style="font-weight:800; color:#a855f7; margin-bottom:4px;">💎 Rocketpot</div>
+          <div style="font-size:16px; color:var(--text);" id="winsRocketpotVal">KES 0.00</div>
+        </div>
+        <div class="card" style="text-align:center; cursor:pointer;" onclick="showPotStat('Grand Jackpot')">
+          <div style="font-weight:800; color:#ef4444; margin-bottom:4px;">💎 Grand Jackpot</div>
+          <div style="font-size:16px; color:var(--text);" id="winsGrandJackpotVal">KES 0.00</div>
+        </div>
+      </div>
+      <p style="text-align:center;color:var(--muted);font-size:13px;">Tap a pot to see its highest and lowest won value.</p>
+    </section>
+
+    <!-- POT STAT OVERLAY -->
+    <div id="potStatOverlay" class="overlay hidden">
+      <div class="overlay-box" style="text-align:center;">
+        <h3 id="potStatTitle" style="margin-bottom:12px;">Pot</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+          <div style="background:var(--card); border-radius:10px; padding:12px;">
+            <div style="font-size:11px;color:var(--muted);">Highest Won</div>
+            <div id="potStatHigh" style="font-size:20px;font-weight:800;color:var(--green);">KES 0.00</div>
+          </div>
+          <div style="background:var(--card); border-radius:10px; padding:12px;">
+            <div style="font-size:11px;color:var(--muted);">Lowest Won</div>
+            <div id="potStatLow" style="font-size:20px;font-weight:800;color:var(--red);">KES 0.00</div>
+          </div>
+        </div>
+        <p id="potStatCount" style="color:var(--muted);font-size:12px;margin-bottom:16px;"></p>
+        <button class="btn gold" style="align-self:center;" onclick="document.getElementById('potStatOverlay').classList.add('hidden')">Close</button>
+      </div>
+    </div>
     <section id="videos" class="hidden">
       <div class="grid grid-3">
         <div class="card">
@@ -818,8 +856,8 @@
     const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
     document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
   }
-  const titles = {home:'Dashboard', videos:'Watch Videos', surveys:'Surveys', dice:'Dice vs AI', refer:'Refer Friends', wallet:'Wallet', profile:'My Profile', contact:'Contact', notifications:'Notifications', redeem:'Redeem Voucher', rules:'Rules', donate:'Donate'};
-  const subs = {home:'Welcome back — start earning today.', videos:'Watch short clips for rewards.', surveys:'Share your opinion, get paid.', dice:'Beat the AI and win.', refer:'Invite friends, earn more.', wallet:'Manage your earnings.', profile:'Manage your addresses.', contact:'Get in touch.', notifications:'System notifications.', redeem:'Enter your voucher code.', rules:'Platform rules and guidelines.', donate:'Support a cause.'};
+  const titles = {home:'Dashboard', videos:'Watch Videos', surveys:'Surveys', dice:'Dice vs AI', refer:'Refer Friends', wallet:'Wallet', profile:'My Profile', contact:'Contact', notifications:'Notifications', redeem:'Redeem Voucher', rules:'Rules', donate:'Donate', wins:'Wins'};
+  const subs = {home:'Welcome back — start earning today.', videos:'Watch short clips for rewards.', surveys:'Share your opinion, get paid.', dice:'Beat the AI and win.', refer:'Invite friends, earn more.', wallet:'Manage your earnings.', profile:'Manage your addresses.', contact:'Get in touch.', notifications:'System notifications.', redeem:'Enter your voucher code.', rules:'Platform rules and guidelines.', donate:'Support a cause.', wins:'Highest and lowest pot wins.'};
   function show(v){
     document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
     document.getElementById(v).classList.remove('hidden');
@@ -1104,10 +1142,13 @@
     updateUI();
   }
   function closeDepSuccess(){ document.getElementById('depSuccess').classList.add('hidden'); }
-  updateUI();
-  updateBoosterpotUI();
-  updaterocketpotUI();
-  updateGrandJackpotUI();
+   function showPotStat(name){ const wins = name==='Boosterpot'? BoosterpotWins : name==='Rocketpot'? rocketpotWins : grandJackpotWins; const title=document.getElementById('potStatTitle'); const high=document.getElementById('potStatHigh'); const low=document.getElementById('potStatLow'); const count=document.getElementById('potStatCount'); if(title) title.textContent = name; if(wins.length){ const vals=wins.map(w=>w.amount); const h=Math.max(...vals); const l=Math.min(...vals); if(high) high.textContent='+ '+money(h); if(low) low.textContent='+ '+money(l); if(count) count.textContent = wins.length+' win(s) recorded.'; } else { if(high) high.textContent='KES 0.00'; if(low) low.textContent='KES 0.00'; if(count) count.textContent='No wins yet.'; } document.getElementById('potStatOverlay').classList.remove('hidden'); }
+   function updateWinsUI(){ const b=document.getElementById('winsBoosterpotVal'); const r=document.getElementById('winsRocketpotVal'); const g=document.getElementById('winsGrandJackpotVal'); if(b) b.textContent='KES '+BoosterpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(r) r.textContent='KES '+rocketpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(g) g.textContent='KES '+grandJackpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+   updateUI();
+   updateBoosterpotUI();
+   updaterocketpotUI();
+   updateGrandJackpotUI();
+   updateWinsUI();
   setInterval(()=>{
     [['lastVideo1','vTimer1'],['lastVideo2','vTimer2'],['lastVideo3','vTimer3'],['lastVideo4','vTimer4'],['lastVideo5','vTimer5'],['lastVideo6','vTimer6'],['lastSurvey','sTimer'],['lastSurvey','sTimerList'],['lastSurvey2','sTimer2'],['lastSurvey2','sTimerList2']].forEach(([k,id])=>{
       const last = localStorage.getItem(k);
