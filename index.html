@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>EarnHub — Earn by Watching, Surveys, Referrals & Dice</title>
+<title>EarnHub Dice vs AI</title>
 <style>
   :root {
     --bg: #0b0f1a;
@@ -18,1146 +18,834 @@
     --muted: #9aa3b2;
     --border: #2a3348;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    margin: 0;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: radial-gradient(1200px 600px at 20% -10%, #1a2040, transparent), var(--bg);
     color: var(--text);
     min-height: 100vh;
+    padding: 8px;
+    padding-bottom: 80px;
   }
-  .app { display: flex; min-height: 100vh; }
-  aside {
-    width: 240px;
-    background: var(--card);
-    border-right: 1px solid var(--border);
-    padding: 20px 14px;
-    position: sticky; top: 0; height: 100vh;
-  }
-  .brand { font-size: 22px; font-weight: 800; color: var(--accent2); margin-bottom: 24px; }
-  .brand span { color: var(--gold); }
-  nav a {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 10px;
-    color: var(--muted); text-decoration: none; margin-bottom: 4px;
-    cursor: pointer; font-size: 14px;
-  }
-  nav a.active, nav a:hover { background: var(--card2); color: var(--text); }
-  main { flex: 1; padding: 24px; max-width: 1100px; }
-  .topbar {
+  .container { max-width: 480px; margin: 0 auto; }
+  .header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
   }
-  .theme-toggle { position: fixed; bottom: 16px; left: 16px; z-index: 1500; background: var(--card); border: 1px solid var(--border); padding: 8px 14px; border-radius: 999px; cursor: pointer; font-size: 14px; color: var(--text); }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand-logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent2), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; color: var(--bg);
+  }
+  .brand-text { font-size: 16px; font-weight: 800; }
+  .brand-text span { color: var(--gold); }
   .wallet-pill {
-    position: fixed; top: 12px; right: 12px; z-index: 1500;
-    background: linear-gradient(135deg, #7c5cff, #22d3ee);
-    padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: 14px;
-    box-shadow: 0 6px 20px rgba(124,92,255,.45), 0 0 0 1px rgba(255,255,255,.15) inset;
-    backdrop-filter: blur(8px); cursor: pointer; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 8px 14px; border-radius: 999px; font-weight: 800; font-size: 13px;
+    box-shadow: 0 6px 20px rgba(124,92,255,.45); color: #fff;
+    cursor: pointer;
   }
-  }
-  h1 { font-size: 26px; margin: 0 0 6px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .grid { display: grid; gap: 16px; }
-  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
   .card {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px; padding: 18px;
+    border-radius: 12px; padding: 14px; margin-bottom: 12px;
   }
-  .card h3 { margin: 0 0 8px; }
-  .card p { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  .card h3 { margin: 0 0 8px; font-size: 15px; }
+  .card p { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
+  .pots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+  .pot-card {
+    cursor: pointer; padding: 8px; border-radius: 8px; text-align: center;
+    background: var(--card2); border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .pot-card.boosterpot { border-color: var(--gold); color: var(--gold); }
+  .pot-card.rocketpot { border-color: #a855f7; color: #a855f7; }
+  .pot-card.grandjackpot { border-color: var(--red); color: var(--red); }
+  .pot-label { font-weight: 700; font-size: 9px; margin-bottom: 2px; }
+  .pot-value { font-weight: 800; font-size: 13px; }
   .btn {
     background: var(--accent); color: #fff; border: none;
-    padding: 10px 16px; border-radius: 10px; cursor: pointer;
-    font-weight: 600; font-size: 14px; transition: transform .1s;
+    padding: 10px 16px; border-radius: 8px; cursor: pointer;
+    font-weight: 600; font-size: 13px; transition: transform .1s;
+    width: 100%; text-align: center;
   }
   .btn:hover { transform: translateY(-1px); }
-  .btn.green { background: var(--green); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .btn.gold { background: var(--gold); color: #1a1a1a; }
-  .btn.red { background: var(--red); }
+  .btn.green { background: var(--green); }
   .btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
-  .stat { font-size: 30px; font-weight: 800; }
-  .stat small { font-size: 12px; color: var(--muted); font-weight: 400; display: block; }
-  .video-box {
-    background: #000; border-radius: 12px; overflow: hidden;
-    aspect-ratio: 16/9; position: relative; margin-bottom: 12px;
+  .btn.red { background: var(--red); }
+  .bet-input {
+    width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card2); color: var(--text); font-size: 14px; margin-bottom: 8px;
+    -moz-appearance: textfield;
   }
-  .video-box .play {
-    position: absolute; inset: 0; display: flex; align-items: center;
-    justify-content: center; font-size: 48px; color: #fff;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
+  .bet-input::-webkit-outer-spin-button,
+  .bet-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .quick-bets { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+  .quick-bet { flex: 1; min-width: 42px; padding: 8px; font-size: 11px; }
+  .dice-area { display: flex; justify-content: center; gap: 20px; margin: 16px 0; flex-wrap: wrap; }
+  .dice-box { text-align: center; }
+  .dice-label { font-size: 10px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+  .dice {
+    font-size: 48px; display: inline-block; padding: 8px;
+    border-radius: 12px; background: linear-gradient(135deg, var(--card2), var(--card));
+    box-shadow: 0 8px 20px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.05);
+    transform: perspective(500px) rotateX(15deg) rotateY(-15deg);
+    color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.6);
+    min-width: 80px; transition: transform 0.1s;
   }
-  .progress { height: 6px; background: var(--card2); border-radius: 4px; overflow: hidden; margin: 8px 0; }
-  .progress > div { height: 100%; background: var(--accent2); width: 0%; transition: width .3s; }
-  .survey-q { margin: 12px 0; }
-  .survey-q label { display: block; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin: 6px 0; cursor: pointer; }
-  .survey-q label:hover { border-color: var(--accent); }
-  .dice-area { text-align: center; }
-  .dice { font-size: 50px; margin: 8px; display:inline-block; padding:6px; border-radius:12px; background: transparent; box-shadow: 0 10px 20px rgba(0,0,0,.4); transform: perspective(500px) rotateX(15deg) rotateY(-15deg); color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,.6); }
-  .dice.rolling { animation: diceRoll .6s linear infinite; }
-  @keyframes diceRoll { 0%{transform:perspective(500px) rotateX(0deg) rotateY(0deg);} 100%{transform:perspective(500px) rotateX(360deg) rotateY(360deg);} }
-  .wallet-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .wallet-row:last-child { border: none; }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; background: var(--card2); color: var(--muted); }
+  .dice.rolling { animation: diceRoll 0.6s linear infinite; }
+  @keyframes diceRoll {
+    0% { transform: perspective(500px) rotateX(0deg) rotateY(0deg); }
+    100% { transform: perspective(500px) rotateX(360deg) rotateY(360deg); }
+  }
+  .status { text-align: center; margin: 10px 0; font-weight: 600; min-height: 20px; font-size: 13px; }
+  .status.win { color: var(--green); }
+  .status.lose { color: var(--red); }
+  .status.tie { color: var(--muted); }
+  .result { text-align: center; color: var(--muted); margin-bottom: 10px; font-size: 12px; }
   .toast {
-    position: fixed; bottom: 20px; right: 20px; background: var(--card2);
-    border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.4); z-index: 1000;
-    animation: slide .3s ease;
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--card2); border: 1px solid var(--border);
+    padding: 10px 16px; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    z-index: 1000; animation: slideUp 0.3s ease;
   }
-  @keyframes slide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .hidden { display: none !important; }
-  .ref-code { font-family: monospace; background: var(--card2); padding: 8px 12px; border-radius: 8px; display: inline-block; letter-spacing: 2px; }
-  .leader { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-  .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; width: 360px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  .modal-box h3 { margin: 0 0 8px; }
-  .modal-box input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 16px; margin: 12px 0; }
-  .overlay { position: fixed; inset: 0; background: rgba(10,14,24,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 3000; }
-  .overlay-box { background: linear-gradient(160deg, #1b2236, #141a2a); border: 1px solid var(--border); border-radius: 22px; padding: 32px; width: 400px; max-width: 90vw; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.6); animation: pop .25s ease; }
+  @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,14,24,.85);
+    backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;
+    z-index: 3000; padding: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-box {
+    background: linear-gradient(160deg, #1b2236, #141a2a); border: 1px solid var(--border);
+    border-radius: 18px; padding: 24px 20px; width: 100%; max-width: 340px;
+    text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.6); animation: pop 0.25s ease;
+    position: relative;
+  }
+  .overlay-close {
+    position: absolute; top: 12px; right: 12px; width: 32px; height: 32px;
+    border-radius: 8px; background: var(--card2); border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .overlay-close:hover { background: var(--border); color: var(--text); }
   @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .overlay-box .big { font-size: 48px; margin-bottom: 10px; }
-  .overlay-box h3 { margin: 0 0 6px; }
-  .overlay-box p { color: var(--muted); font-size: 14px; margin: 4px 0; }
-  .overlay-box .info { background: var(--card2); border-radius: 12px; padding: 14px; margin: 16px 0; text-align: left; font-size: 14px; }
-  .overlay-box .info div { display: flex; justify-content: space-between; padding: 4px 0; }
-  .overlay-box .info strong { color: var(--text); }
+  .overlay-box .big { font-size: 44px; margin-bottom: 8px; }
+  .overlay-box h3 { margin: 0 0 6px; font-size: 18px; }
+  .overlay-box p { color: var(--muted); font-size: 13px; margin: 3px 0; }
+  .overlay-box .prize { font-size: 22px; font-weight: 900; margin: 12px 0; color: #fff; text-shadow: 0 0 20px currentColor; }
+  .overlay-box .btn { margin-top: 6px; }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type=number] { -moz-appearance: textfield; }
-  body.light { --bg:#f5f7fb; --card:#ffffff; --card2:#eef2f7; --border:#dfe3ea; --text:#1a1a1a; --muted:#555; }
+  footer { text-align:center; padding:10px; color:var(--muted); font-size:10px; border-top:1px solid var(--border); margin-top: 12px; }
+  .view.hidden { display: none; }
+  .wallet-stat { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .wallet-stat:last-child { border-bottom: none; }
+  .wallet-stat .label { color: var(--muted); font-size: 13px; }
+  .wallet-stat .value { font-weight: 700; font-size: 15px; }
+  .wallet-stat .value.bonus { color: var(--gold); }
+  .wallet-stat .value.ref { color: var(--accent2); }
+  .action-btn { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--card2); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s; }
+  .action-btn:hover { background: var(--border); }
+  .action-btn .icon { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .action-btn .text { flex: 1; font-weight: 600; font-size: 14px; }
+  .action-btn .arrow { color: var(--muted); font-size: 18px; }
+  .modal {
+    position: fixed; inset: 0; background: rgba(10,14,24,.9);
+    backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;
+    z-index: 4000; padding: 16px;
+  }
+  .modal.hidden { display: none; }
+  .modal-box {
+    background: linear-gradient(160deg, #1b2236, #141a2a); border: 1px solid var(--border);
+    border-radius: 18px; padding: 24px 20px; width: 100%; max-width: 360px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6); animation: pop 0.25s ease;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-header h3 { margin: 0; font-size: 18px; }
+  .modal-close { width: 32px; height: 32px; border-radius: 8px; background: var(--card2); border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--muted); }
+  .form-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 14px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .modal-actions .btn { flex: 1; }
+  .voucher-success { text-align: center; padding: 16px; }
+  .voucher-success .big { font-size: 56px; margin-bottom: 12px; }
+  .voucher-success h3 { margin-bottom: 8px; }
+  .voucher-success p { color: var(--muted); margin-bottom: 4px; }
+  .voucher-success .amount { font-size: 24px; font-weight: 900; color: var(--gold); margin: 16px 0; }
 </style>
 </head>
 <body>
-<div class="app">
-  <aside>
-    <div class="brand"><svg width="32" height="32" viewBox="0 0 32 32" style="vertical-align:middle; margin-right:8px;"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs><circle cx="16" cy="16" r="14" fill="none" stroke="url(#g)" stroke-width="2.5"/><path d="M16 8 L16 24 M11 13 L16 8 L21 13" stroke="url(#g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="16" cy="16" r="3" fill="#fbbf24"/></svg>Earn<span>Hub</span></div>
-    <nav>
-      <a class="active" data-view="home">🏠 Dashboard</a>
-      <a data-view="videos">🎬 Watch Videos</a>
-      <a data-view="surveys">📋 Surveys</a>
-       <a data-view="dice">🎲 Dice vs AI</a>
-       <a data-view="refer">👥 Refer Friends</a>
-      <a data-view="profile">👤 My Profile</a>
-      <a data-view="contact">📞 Contact</a>
-      <a data-view="notifications">🔔 Notifications</a>
-      <a data-view="redeem">🎁 Redeem Voucher</a>
-      <a data-view="rules">📜 Rules</a>
-      <a data-view="donate">❤️ Donate</a>
-      <a data-view="wins">🏆 Wins</a>
-      <a data-view="wallet">💰 Wallet</a>
-    </nav>
-    <div style="margin-top:24px; font-size:12px; color:var(--muted);">
-      Earn points, redeem anytime.
+<div class="container">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M16 8 L16 24 M11 13 L16 8 L21 13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="brand-text">Earn<span>Hub</span></span>
     </div>
-  </aside>
-  <main>
-    <div class="topbar">
-      <div>
-        <h1 id="title">Dashboard</h1>
-        <p class="sub" id="subtitle">Welcome back — start earning today.</p>
-      </div>
-      <div class="wallet-pill" id="walletPill" onclick="show('wallet')" style="cursor:pointer;"><span id="walletPillAmt">KES 0.00</span></div>
-    </div>
+    <div class="wallet-pill" id="walletPill" onclick="showView('wallet')">KES 0.00</div>
+  </header>
 
-    <!-- HOME -->
-    <section id="home">
-      <div class="grid grid-3">
-        <div class="card"><div class="stat" id="statBalance">KES 0.00<small>Wallet balance</small></div></div>
-        <div class="card"><div class="stat" id="statTasks">0<small>Tasks completed</small></div></div>
-        <div class="card"><div class="stat" id="statRef">0<small>Friends referred</small></div></div>
+  <!-- DICE VIEW -->
+  <section id="diceView" class="view">
+    <section class="card">
+      <h3>🎲 Dice vs AI</h3>
+      <p>Roll higher than the AI to win 2x your bet. Each bet contributes to the jackpot pots.</p>
+      
+      <div class="pots-grid">
+        <div class="pot-card boosterpot" onclick="showPotHistory('Boosterpot')">
+          <div class="pot-label">🏆 Boosterpot</div>
+          <div class="pot-value">KES <span id="BoosterpotPot">0.00</span></div>
+        </div>
+        <div class="pot-card rocketpot" onclick="showPotHistory('Rocketpot')">
+          <div class="pot-label">💎 Rocketpot</div>
+          <div class="pot-value">KES <span id="rocketpotPot">0.00</span></div>
+        </div>
+        <div class="pot-card grandjackpot" onclick="showPotHistory('Grand Jackpot')">
+          <div class="pot-label">💎 Grand Jackpot</div>
+          <div class="pot-value">KES <span id="grandJackpotPot">0.00</span></div>
+        </div>
       </div>
-      <div class="card" style="margin-top:16px;">
-        <h3>Recent Activity</h3>
-        <div id="activity"></div>
-        <button class="btn ghost" style="margin-top:10px;" onclick="showAllActivity()">View All Activity</button>
+
+      <input type="number" id="betAmt" class="bet-input" placeholder="Bet amount (KES)" min="10" max="70000" value="100" />
+      
+      <div class="quick-bets">
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 10)">10</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 20)">20</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 50)">50</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 100)">100</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 200)">200</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 500)">500</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 1000)">1K</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 5000)">5K</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 10000)">10K</button>
+        <button class="btn ghost quick-bet" onclick="setAmt('betAmt', 70000)">Max</button>
+      </div>
+
+      <div class="dice-area">
+        <div class="dice-box">
+          <div class="dice-label">You</div>
+          <div class="dice" id="userDice">⚀</div>
+        </div>
+        <div class="dice-box">
+          <div class="dice-label">AI</div>
+          <div class="dice" id="aiDice">⚀</div>
+        </div>
+      </div>
+
+      <div id="diceStatus" class="status">Your turn — roll the dice!</div>
+      <div id="diceResult" class="result"></div>
+      
+      <button class="btn gold" id="rollBtn" onclick="rollDice()">Roll Dice</button>
+      <button class="btn ghost" style="margin-top: 8px;" onclick="showAllPotHistory()">View Won Pots History</button>
+    </section>
+  </section>
+
+  <!-- WALLET VIEW -->
+  <section id="walletView" class="view hidden">
+    <section class="card">
+      <h3>💰 Wallet</h3>
+      <div class="wallet-stat">
+        <span class="label">Wallet Balance</span>
+        <span class="value" id="walletBalance">KES 0.00</span>
+      </div>
+      <div class="wallet-stat">
+        <span class="label">Bonus Balance</span>
+        <span class="value bonus" id="bonusBalance">KES 0.00</span>
+      </div>
+      <div class="wallet-stat">
+        <span class="label">Referral Bonus</span>
+        <span class="value ref" id="referralBonus">KES 0.00</span>
       </div>
     </section>
 
-    <!-- WINS -->
-    <section id="wins" class="hidden">
-      <h2 style="margin-bottom:16px; text-align:center;">🏆 Pot Wins</h2>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:16px;">
-        <div class="card" style="text-align:center; cursor:pointer;" onclick="showPotStat('Boosterpot')">
-          <div style="font-weight:800; color:var(--gold); margin-bottom:4px;">🏆 Boosterpot</div>
-          <div style="font-size:16px; color:var(--text);" id="winsBoosterpotVal">KES 0.00</div>
-        </div>
-        <div class="card" style="text-align:center; cursor:pointer;" onclick="showPotStat('Rocketpot')">
-          <div style="font-weight:800; color:#a855f7; margin-bottom:4px;">💎 Rocketpot</div>
-          <div style="font-size:16px; color:var(--text);" id="winsRocketpotVal">KES 0.00</div>
-        </div>
-        <div class="card" style="text-align:center; cursor:pointer;" onclick="showPotStat('Grand Jackpot')">
-          <div style="font-weight:800; color:#ef4444; margin-bottom:4px;">💎 Grand Jackpot</div>
-          <div style="font-size:16px; color:var(--text);" id="winsGrandJackpotVal">KES 0.00</div>
-        </div>
+    <section class="card">
+      <h3>Actions</h3>
+      <div class="action-btn" onclick="openModal('depositModal')">
+        <div class="icon">💳</div>
+        <div class="text">Deposit</div>
+        <div class="arrow">→</div>
       </div>
-      <p style="text-align:center;color:var(--muted);font-size:13px;">Tap a pot to see its highest and lowest won value.</p>
-    </section>
-
-    <!-- POT STAT OVERLAY -->
-    <div id="potStatOverlay" class="overlay hidden">
-      <div class="overlay-box" style="text-align:center;">
-        <h3 id="potStatTitle" style="margin-bottom:12px;">Pot</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-          <div style="background:var(--card); border-radius:10px; padding:12px;">
-            <div style="font-size:11px;color:var(--muted);">Highest Won</div>
-            <div id="potStatHigh" style="font-size:20px;font-weight:800;color:var(--green);">KES 0.00</div>
-          </div>
-          <div style="background:var(--card); border-radius:10px; padding:12px;">
-            <div style="font-size:11px;color:var(--muted);">Lowest Won</div>
-            <div id="potStatLow" style="font-size:20px;font-weight:800;color:var(--red);">KES 0.00</div>
-          </div>
-        </div>
-        <p id="potStatCount" style="color:var(--muted);font-size:12px;margin-bottom:16px;"></p>
-        <button class="btn gold" style="align-self:center;" onclick="document.getElementById('potStatOverlay').classList.add('hidden')">Close</button>
+      <div class="action-btn" onclick="openModal('withdrawModal')">
+        <div class="icon" style="background: linear-gradient(135deg, var(--red), #ef4444);">💸</div>
+        <div class="text">Withdraw</div>
+        <div class="arrow">→</div>
       </div>
-    </div>
-    <section id="videos" class="hidden">
-      <div class="grid grid-3">
-        <div class="card">
-        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/nSuHI99MR7A','lastVideo1');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
-        <h3>ITAANA OFFICIAL VIDEO BY NAITEMU</h3>
-        <p>Watch on YouTube to earn KES 10.00</p>
-          <div class="progress"><div id="vprog"></div></div>
-          <button class="btn" id="vbtn" onclick="watchVideo('https://youtu.be/nSuHI99MR7A','lastVideo1')">Start watching</button>
-          <div id="vTimer1" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-        <div class="card">
-        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/zF4UcecXqB0','lastVideo2');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
-        <h3>AIRA ASIPANI OFFICIAL 4K VIDEO BY NAITEMU</h3>
-        <p>Watch on YouTube to earn KES 10.00</p>
-          <div class="progress"><div></div></div>
-          <button class="btn" onclick="watchVideo('https://youtu.be/zF4UcecXqB0','lastVideo2')">Start watching</button>
-          <div id="vTimer2" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-        <div class="card">
-        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/07KMvIfr49I','lastVideo3');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
-        <h3>SUPATI OFFICIAL 4K VIDEO BY NAITEMU</h3>
-        <p>Watch on YouTube to earn KES 10.00</p>
-          <div class="progress"><div></div></div>
-          <button class="btn" onclick="watchVideo('https://youtu.be/07KMvIfr49I','lastVideo3')">Start watching</button>
-          <div id="vTimer3" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-        <div class="card">
-        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/ghzyTalVD5g','lastVideo4');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
-        <h3>AIDIPA OFFICIAL 4K MUSIC VIDEO BY NAITEMU</h3>
-        <p>Watch on YouTube to earn KES 10.00</p>
-          <div class="progress"><div></div></div>
-          <button class="btn" onclick="watchVideo('https://youtu.be/ghzyTalVD5g','lastVideo4')">Start watching</button>
-          <div id="vTimer4" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-        <div class="card">
-        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/TnJ8bjyzBZU','lastVideo5');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
-        <h3>NAITEMU - KIBOITARE ENAKE OFFICIAL MUSIC VIDEO</h3>
-        <p>Watch on YouTube to earn KES 10.00</p>
-          <div class="progress"><div></div></div>
-          <button class="btn" onclick="watchVideo('https://youtu.be/TnJ8bjyzBZU','lastVideo5')">Start watching</button>
-          <div id="vTimer5" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-        <div class="card">
-        <div class="video-box"><a href="#" onclick="watchVideo('https://youtu.be/cUvbQQGKNag','lastVideo6');return false;" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;color:#fff;text-decoration:none;background:linear-gradient(135deg,#1a1a2e,#16213e);">▶</a></div>
-        <h3>KINTAASA OFFICIAL 4K VIDEO BY NAITEMU</h3>
-        <p>Watch on YouTube to earn KES 10.00</p>
-          <div class="progress"><div></div></div>
-          <button class="btn" onclick="watchVideo('https://youtu.be/cUvbQQGKNag','lastVideo6')">Start watching</button>
-          <div id="vTimer6" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
+      <div class="action-btn" onclick="openModal('redeemModal')">
+        <div class="icon" style="background: linear-gradient(135deg, var(--gold), #fbbf24);">🎁</div>
+        <div class="text">Redeem Voucher</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="action-btn" onclick="openModal('referModal')">
+        <div class="icon" style="background: linear-gradient(135deg, var(--accent2), #22d3ee);">👥</div>
+        <div class="text">Refer Friends</div>
+        <div class="arrow">→</div>
       </div>
     </section>
 
-    <!-- SURVEYS -->
-    <section id="surveys" class="hidden">
-      <div id="surveyList">
-        <div class="card" style="cursor:pointer;" onclick="openSurvey(1)">
-          <h3>Survey 1 — Consumer Habits</h3>
-          <p>Reward: KES 50.00 • 3 questions</p>
-          <div id="sTimerList" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-        <div class="card" style="cursor:pointer; margin-top:12px;" onclick="openSurvey(2)">
-          <h3>Survey 2 — Social Media & Youth</h3>
-          <p>Reward: KES 50.00 • 3 questions</p>
-          <div id="sTimerList2" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-      </div>
-      <div id="surveyForm1" class="hidden">
-        <button class="btn ghost" onclick="closeSurvey()" style="margin-bottom:12px;">← Back to list</button>
-        <div class="card">
-          <h3>Quick Survey — Consumer Habits</h3>
-          <p>Reward: KES 50.00 • 3 questions</p>
-          <div class="survey-q">
-            <strong>1. How often do you shop online?</strong>
-            <label><input type="radio" name="q1" value="daily"> Daily</label>
-            <label><input type="radio" name="q1" value="weekly"> Weekly</label>
-            <label><input type="radio" name="q1" value="monthly"> Monthly</label>
-          </div>
-          <div class="survey-q">
-            <strong>2. Preferred payment method?</strong>
-            <label><input type="radio" name="q2" value="card"> Card</label>
-            <label><input type="radio" name="q2" value="wallet"> Digital wallet</label>
-            <label><input type="radio" name="q2" value="cash"> Cash</label>
-          </div>
-          <div class="survey-q">
-            <strong>3. Would you recommend EarnHub?</strong>
-            <label><input type="radio" name="q3" value="yes"> Yes</label>
-            <label><input type="radio" name="q3" value="no"> No</label>
-          </div>
-          <button class="btn green" onclick="submitSurvey()">Submit Survey</button>
-          <div id="sTimer" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-         </div>
-      </div>
-      <div id="surveyForm2" class="hidden">
-        <button class="btn ghost" onclick="closeSurvey()" style="margin-bottom:12px;">← Back to list</button>
-        <div class="card">
-          <h3>Survey 2 — Social Media & Youth</h3>
-          <p>Reward: KES 50.00 • 3 questions</p>
-          <div class="survey-q">
-            <strong>1. How often do you use social media?</strong>
-            <label><input type="radio" name="q4" value="daily"> Daily</label>
-            <label><input type="radio" name="q4" value="weekly"> Weekly</label>
-            <label><input type="radio" name="q4" value="rarely"> Rarely</label>
-          </div>
-          <div class="survey-q">
-            <strong>2. Which platform do you use most?</strong>
-            <label><input type="radio" name="q5" value="tiktok"> TikTok</label>
-            <label><input type="radio" name="q5" value="instagram"> Instagram</label>
-            <label><input type="radio" name="q5" value="facebook"> Facebook</label>
-          </div>
-          <div class="survey-q">
-            <strong>3. Do you think social media affects youth mental health?</strong>
-            <label><input type="radio" name="q6" value="yes"> Yes</label>
-            <label><input type="radio" name="q6" value="no"> No</label>
-          </div>
-          <button class="btn green" onclick="submitSurvey2()">Submit Survey</button>
-          <div id="sTimer2" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-        </div>
-      </div>
-    </section>
-    <section id="dice" class="hidden">
-      <div class="card dice-area">
-         <h3>Roll Dice vs AI</h3>
-         <p>Enter your bet amount. Win pays 2x your bet.</p>
-         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
-            <div onclick="showSinglePotHistory('Boosterpot')" style="cursor:pointer; padding:8px 10px; border:1px solid var(--gold); border-radius:10px; color:var(--gold); font-weight:700; text-align:center; font-size:13px;">🏆 Boosterpot<br>KES <span id="BoosterpotPot">0.00</span></div>
-            <div onclick="showSinglePotHistory('Rocketpot')" style="cursor:pointer; padding:8px 10px; border:1px solid #a855f7; border-radius:10px; color:#a855f7; font-weight:700; text-align:center; font-size:13px;">💎 Rocketpot<br>KES <span id="rocketpotPot">0.00</span></div>
-            <div onclick="showSinglePotHistory('Grand Jackpot')" style="cursor:pointer; padding:8px 10px; border:1px solid #ef4444; border-radius:10px; color:#ef4444; font-weight:700; text-align:center; font-size:13px;">💎 Grand Jackpot<br>KES <span id="grandJackpotPot">0.00</span></div>
-         </div>
-         <button class="btn ghost" style="margin-top:8px;" onclick="showBoosterpotHistory()">View Won Pots</button>
-        <input type="number" id="betAmt" placeholder="Bet amount (KES)" min="10" max="70000" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-          <button class="btn ghost" onclick="setAmt('betAmt',10)">10</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',20)">20</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',30)">30</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',40)">40</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',50)">50</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',100)">100</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',150)">150</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',200)">200</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',250)">250</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',500)">500</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',1000)">1000</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',2000)">2000</button>
-          <button class="btn ghost" onclick="setAmt('betAmt',5000)">5000</button>
-           <button class="btn ghost" onclick="setAmt('betAmt',10000)">10000</button>
-           <button class="btn ghost" onclick="setAmt('betAmt',70000)">Max</button>
-        </div>
-        <div style="display:flex; gap:24px; justify-content:center; flex-wrap:wrap; margin:16px 0;">
-          <div>
-            <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">You</div>
-            <div class="dice" id="userDice">🎲</div>
-          </div>
-          <div>
-            <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">AI</div>
-            <div class="dice" id="aiDice">🎲</div>
-          </div>
-        </div>
-        <div id="diceStatus" style="margin:10px 0; color:var(--accent2); font-weight:600;">Your turn — roll the dice!</div>
-        <div id="diceResult" style="margin:6px 0; color:var(--muted);"></div>
-        <button class="btn gold" id="rollBtn" onclick="rollDice()">Roll Dice</button>
-      </div>
-    </section>
-
-    <!-- REFER -->
-    <section id="refer" class="hidden">
-      <div class="card">
-        <h3>Your Referral ID</h3>
-        <div class="ref-code" id="refId">-</div>
-        <p style="margin-top:10px;">Share this link with friends and ask them to give you their referral ID to earn bonus:</p>
-        <div class="ref-code" id="refLink" style="font-size:12px; word-break:break-all;"></div>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <h3>Enter Referral ID of Person You Referred</h3>
-        <p>Enter the referral ID of the friend you referred to claim your bonus.</p>
-        <input type="number" id="refInput" placeholder="Referral ID" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-         <button class="btn" onclick="claimReferral()">Claim Bonus</button>
-         <div id="refErr" style="color:var(--red); font-size:12px; margin-top:6px; display:none;"></div>
-         <div style="margin-top:12px;"><strong>Referral History</strong><div id="refHistory" style="margin-top:6px;"></div></div>
-      </div>
-    </section>
-
-    <!-- PROFILE -->
-    <section id="profile" class="hidden">
-      <div class="card">
-        <h3>Bind Withdrawal M-Pesa Number</h3>
-        <input type="tel" id="wdAddr" placeholder="M-Pesa number" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-        <div style="display:flex; gap:8px;">
-          <button class="btn" onclick="bindAddr('wd')">Bind</button>
-          <button class="btn ghost" id="wdChange" onclick="changeAddr('wd')" style="display:none;">Change</button>
-        </div>
-        <div id="wdAddrShow" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <h3>Bind Deposit M-Pesa Number</h3>
-        <input type="tel" id="depAddr" placeholder="M-Pesa number" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-        <div style="display:flex; gap:8px;">
-          <button class="btn" onclick="bindAddr('dep')">Bind</button>
-          <button class="btn ghost" id="depChange" onclick="changeAddr('dep')" style="display:none;">Change</button>
-        </div>
-        <div id="depAddrShow" style="color:var(--muted); font-size:12px; margin-top:6px;"></div>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <h3>Verification</h3>
-        <div id="vStep1">
-          <p>Step 1: Enter your full legal name as per National ID</p>
-          <input type="text" id="legalName" placeholder="Full legal name" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-          <button class="btn" onclick="vNext(1)">Next</button>
-        </div>
-        <div id="vStep2" class="hidden">
-          <p>Step 2: Upload ID front</p>
-          <label class="btn" style="cursor:pointer; display:inline-block;">Upload<input type="file" accept="image/*" capture="environment" style="display:none;" /></label>
-          <button class="btn ghost" onclick="vBack(2)">Back</button> <button class="btn" onclick="vNext(2)">Next</button>
-        </div>
-        <div id="vStep3" class="hidden">
-          <p>Step 3: Upload ID back</p>
-          <label class="btn" style="cursor:pointer; display:inline-block;">Upload<input type="file" accept="image/*" capture="environment" style="display:none;" /></label>
-          <button class="btn ghost" onclick="vBack(3)">Back</button> <button class="btn" onclick="vNext(3)">Next</button>
-        </div>
-        <div id="vStep4" class="hidden">
-          <p>Step 4: Upload selfie</p>
-          <label class="btn" style="cursor:pointer; display:inline-block;">Upload<input type="file" accept="image/*" capture="environment" style="display:none;" /></label>
-          <button class="btn ghost" onclick="vBack(4)">Back</button> <button class="btn green" onclick="vSubmit()">Submit</button>
-        </div>
-        <div id="vStatus" style="margin-top:10px; display:inline-block; padding:4px 12px; border:1px solid #22c55e; border-radius:999px; color:#22c55e; font-weight:600; font-size:13px;"></div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-     <section id="contact" class="hidden">
-       <div class="card">
-         <h3>Contact Supervisor</h3>
-         <div style="display:flex; gap:12px; align-items:center;">
-           <a href="https://wa.me/254743733752?text=Hello%2C%20I%20am%20using%20EarnHub%20and%20need%20assistance." target="_blank" style="display:inline-block; line-height:0;"><svg width="48" height="48" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
-         </div>
-       </div>
-     </section>
-
-     <!-- NOTIFICATIONS -->
-     <section id="notifications" class="hidden">
-       <div class="card">
-         <h3>Notifications</h3>
-         <div id="notifList" style="display:flex; flex-direction:column; gap:8px;"></div>
-       </div>
-     </section>
-
-    <!-- WALLET -->
-    <section id="wallet" class="hidden">
-       <div class="card">
-          <h3 style="text-align:center;">Wallet</h3>
-         <div style="display:none;">
-           <span id="wBal">KES 0.00</span>
-           <span id="bonusBal">KES 0.00</span>
-           <span id="wTotal">KES 0.00</span>
-           <span id="wWithdrawn">KES 0.00</span>
-         </div>
-          <button class="btn" style="margin:12px 0; align-self:center; display:block;" onclick="showWalletPopup()">View Wallet</button>
-          <div style="margin-top:14px; display:flex; gap:8px;">
-           <button class="btn green" onclick="withdraw()">Withdraw</button>
-           <button class="btn" onclick="deposit()">Deposit</button>
-         </div>
-       </div>
-       <div class="card" style="margin-top:16px;">
-         <h3>Transactions</h3>
-         <div id="txns"></div>
-         <button class="btn ghost" style="margin-top:10px;" onclick="showAllTxns()">View All Transactions</button>
-       </div>
-    </section>
-     <!-- REDEEM -->
-     <section id="redeem" class="hidden">
-       <div class="card">
-         <h3>Redeem Voucher</h3>
-         <p style="color:var(--muted); font-size:13px;">Enter your voucher number to claim a reward. Contact supervisor to get a voucher.</p>
-         <input type="text" id="voucherInput" placeholder="Voucher number" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-         <button class="btn green" onclick="redeemVoucher()">Redeem</button>
-         <div id="voucherErr" style="color:var(--red); font-size:12px; margin-top:6px; display:none;"></div>
-       </div>
-     </section>
-     <!-- RULES -->
-     <section id="rules" class="hidden">
-       <div class="card">
-         <h3>Platform Rules</h3>
-         <ul style="line-height:1.8; padding-left:18px;">
-           <li>Watch videos and complete surveys to earn rewards (24-hour cooldown per task).</li>
-           <li>Bind your M-Pesa number for deposits and withdrawals in My Profile before transacting.</li>
-           <li>Deposits are added to your wallet balance.</li>
-           <li>Bonus earnings can be converted to wallet balance by depositing via bonus.</li>
-           <li>Complete KYC verification (ID + selfie) before deposits/withdrawals.</li>
-           <li>Account must be activated (KES 220 fee) before withdrawals are processed.</li>
-           <li>Withdrawals incur a 5% fee; you will not receive the full amount.</li>
-            <li>Play Dice vs AI to contribute 1.21% of your stake to the Boosterpot pot, 6.76% to the Rocketpot pot, and 71.4236989% to the Grand Jackpot pot; win when a pot reaches its target.</li>
-           <li>One referral ID can be claimed once.</li>
-         </ul>
-       </div>
-     </section>
-     <!-- DONATE -->
-     <section id="donate" class="hidden">
-       <div class="card" id="donateFirms">
-         <h3>Donate</h3>
-         <p style="color:var(--muted); font-size:13px;">Choose a firm to donate to.</p>
-         <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-           <button class="btn" onclick="selectFirm('Orphanage')">Orphanage</button>
-           <button class="btn" onclick="selectFirm('Faith-Based Organisation')">Faith-Based Organisation</button>
-           <button class="btn" onclick="selectFirm('Hospital')">Hospital</button>
-           <button class="btn" onclick="selectFirm('NGO')">NGO</button>
-         </div>
-         <button class="btn ghost" style="margin-top:12px;" onclick="showDonationHistory()">Donation History</button>
-       </div>
-       <div class="card hidden" id="donateForm">
-         <h3 id="donateFirmName">Donate</h3>
-          <p style="color:var(--muted); font-size:13px;">Amount (KES 100 or more)</p>
-         <input type="number" id="donateAmt" placeholder="Amount" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-           <button class="btn ghost" onclick="setAmt('donateAmt',100)">100</button>
-           <button class="btn ghost" onclick="setAmt('donateAmt',200)">200</button>
-           <button class="btn ghost" onclick="setAmt('donateAmt',500)">500</button>
-           <button class="btn ghost" onclick="setAmt('donateAmt',1000)">1000</button>
-           <button class="btn ghost" onclick="setAmt('donateAmt',5000)">5000</button>
-           <button class="btn ghost" onclick="setAmt('donateAmt',10000)">10000</button>
-         </div>
-         <button class="btn green" onclick="doDonate()">Donate</button>
-         <button class="btn ghost" onclick="backToFirms()" style="margin-left:8px;">Back</button>
-         <div id="donateErr" style="color:var(--red); font-size:12px; margin-top:6px; display:none;"></div>
-       </div>
-     </section>
-   </main>
+    <button class="btn ghost" style="margin-top: 8px;" onclick="showView('dice')">← Back to Game</button>
+  </section>
 </div>
-<div id="allActivityOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column; width:460px; max-height:70vh; overflow:auto;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3>All Activity</h3>
-    <div id="allActivityList" style="margin-top:12px; text-align:left;"></div>
-  </div>
-</div>
-<div id="allTxnsOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column; width:460px; max-height:70vh; overflow:auto;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3>All Transactions</h3>
-    <div id="allTxnsList" style="margin-top:12px; text-align:left;"></div>
-  </div>
-</div>
-<div id="congratsOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">🎉</div>
-    <h3>Congratulations!</h3>
-    <p>You have successfully redeemed your voucher.</p>
-    <p><strong>KES 70,000</strong> has been added to your bonus wallet.</p>
-    <button class="btn gold" style="align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Awesome!</button>
-  </div>
-</div>
-<div id="activationOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">🔒</div>
-    <h3>Account Activation Required</h3>
-    <p>To withdraw, activate your account by paying KES 220 to the supervisor's M-Pesa number, then contact supervisor for confirmation.</p>
-    <div class="info">
-      <div><span>Activation fee</span><strong>KES 220.00</strong></div>
-      <div><span>Pay to (M-Pesa)</span><strong>Supervisor M-Pesa</strong></div>
-      <div><span>Phone number</span><strong>0743733752</strong></div>
-    </div>
-    <a href="https://wa.me/254743733752?text=Hello%2C%20I%20have%20paid%20KES%20220%20for%20account%20activation.%20Please%20confirm." target="_blank" class="btn green" style="display:inline-block; text-decoration:none;">Contact Supervisor on WhatsApp</a>
-  </div>
-</div>
-<div id="allNotifsOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column; width:460px; max-height:70vh; overflow:auto;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3>All Notifications</h3>
-    <div id="allNotifsList" style="margin-top:12px; text-align:left;"></div>
-  </div>
-</div>
-<div id="BoosterpotOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
+
+<!-- Jackpot Win Overlays -->
+<div id="boosterpotOverlay" class="overlay hidden">
+  <div class="overlay-box">
+    <button class="overlay-close" onclick="closeOverlay('boosterpotOverlay')">✕</button>
     <div class="big">🏆</div>
-    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">YOU HAVE WON</h3>
-    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">Boosterpot !</h3>
-    <p style="font-size:26px; font-weight:900; margin:12px 0; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);"><strong id="BoosterpotPrize">+ KES 0.00</strong></p>
-    <button class="btn gold" style="align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Collect Win</button>
+    <h3>YOU HAVE WON</h3>
+    <h3 style="color: var(--gold);">Boosterpot!</h3>
+    <div class="prize" style="color: var(--gold);" id="boosterpotPrize">+ KES 0.00</div>
+    <button class="btn gold" onclick="closeOverlay('boosterpotOverlay')">Collect Win</button>
   </div>
 </div>
+
 <div id="rocketpotOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
+  <div class="overlay-box">
+    <button class="overlay-close" onclick="closeOverlay('rocketpotOverlay')">✕</button>
     <div class="big">💎</div>
-    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">YOU HAVE WON</h3>
-    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">Rocketpot !</h3>
-    <p style="font-size:26px; font-weight:900; margin:12px 0; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);"><strong id="rocketpotPrize">+ KES 0.00</strong></p>
-    <button class="btn gold" style="align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Collect Win</button>
+    <h3>YOU HAVE WON</h3>
+    <h3 style="color: #a855f7;">Rocketpot!</h3>
+    <div class="prize" style="color: #a855f7;" id="rocketpotPrize">+ KES 0.00</div>
+    <button class="btn gold" onclick="closeOverlay('rocketpotOverlay')">Collect Win</button>
   </div>
 </div>
+
 <div id="grandJackpotOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
+  <div class="overlay-box">
+    <button class="overlay-close" onclick="closeOverlay('grandJackpotOverlay')">✕</button>
     <div class="big">💎</div>
-    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">YOU HAVE WON</h3>
-    <h3 style="margin:4px 0; font-size:26px; font-weight:900; letter-spacing:2px; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);">GRAND JACKPOT !</h3>
-    <p style="font-size:26px; font-weight:900; margin:12px 0; color:#fff; -webkit-text-stroke:2px #c0c0c0; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(255,255,255,.9),0 0 20px rgba(255,255,255,.6),inset 0 1px 0 rgba(255,255,255,.9);"><strong id="grandJackpotPrize">+ KES 0.00</strong></p>
-    <button class="btn gold" style="align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Collect Win</button>
+    <h3>YOU HAVE WON</h3>
+    <h3 style="color: var(--red);">GRAND JACKPOT!</h3>
+    <div class="prize" style="color: var(--red);" id="grandJackpotPrize">+ KES 0.00</div>
+    <button class="btn gold" onclick="closeOverlay('grandJackpotOverlay')">Collect Win</button>
   </div>
 </div>
-<div id="BoosterpotHistoryOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column; width:560px; max-height:75vh; overflow:auto;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3 style="text-align:center; margin-bottom:16px;">🏆 Won Pots History</h3>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-      <div style="background:var(--card2); border-radius:12px; padding:12px;">
-        <div style="font-weight:800; color:var(--gold); margin-bottom:8px; text-align:center;">Boosterpot</div>
-        <div id="BoosterpotWinsList"></div>
+
+<!-- Pot History Overlay -->
+<div id="potHistoryOverlay" class="overlay hidden">
+  <div class="overlay-box" style="max-height: 80vh; overflow-y: auto;">
+    <button class="overlay-close" onclick="closeOverlay('potHistoryOverlay')">✕</button>
+    <h3 style="text-align:center; margin-bottom:20px;">🏆 Won Pots History</h3>
+    <div style="display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:8px;">
+      <div style="background:var(--card2); border-radius:12px; padding:10px; min-width:0;">
+        <div style="font-weight:800; color:var(--gold); margin-bottom:8px; text-align:center; font-size:12px;">Boosterpot</div>
+        <div id="boosterpotWinsList"></div>
       </div>
-      <div style="background:var(--card2); border-radius:12px; padding:12px;">
-        <div style="font-weight:800; color:#a855f7; margin-bottom:8px; text-align:center;">Rocketpot</div>
+      <div style="background:var(--card2); border-radius:12px; padding:10px; min-width:0;">
+        <div style="font-weight:800; color:#a855f7; margin-bottom:8px; text-align:center; font-size:12px;">Rocketpot</div>
         <div id="rocketpotWinsList"></div>
       </div>
-      <div style="background:var(--card2); border-radius:12px; padding:12px;">
-        <div style="font-weight:800; color:#ef4444; margin-bottom:8px; text-align:center;">Grand Jackpot</div>
+      <div style="background:var(--card2); border-radius:12px; padding:10px; min-width:0;">
+        <div style="font-weight:800; color:var(--red); margin-bottom:8px; text-align:center; font-size:12px;">Grand Jackpot</div>
         <div id="grandJackpotWinsList"></div>
       </div>
     </div>
   </div>
 </div>
-<div id="donateOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative;">
-    <div class="big">❤️</div>
-    <h3>Donation Successful</h3>
-    <div class="info" id="donateInfo"></div>
-    <button class="btn gold" style="margin-top:12px; align-self:center;" onclick="this.closest('.overlay').classList.add('hidden')">Okay</button>
-  </div>
-</div>
-<div id="donationHistoryOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; width:600px; max-height:70vh; overflow:auto;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3 style="text-align:center; margin-bottom:16px; font-size:24px; font-weight:900; color:#a855f7; text-shadow:0 1px 0 #888,0 2px 0 #666,0 3px 0 #444,0 4px 6px rgba(0,0,0,.8),0 0 10px rgba(168,85,247,.9),0 0 20px rgba(168,85,247,.6);">❤️ Donation History</h3>
-    <div id="donationHistoryList"></div>
-  </div>
-</div>
-<div id="walletPopupOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; width:420px;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">💰</div>
-    <h3 style="text-align:center;">Wallet</h3>
-    <div class="info" id="walletPopupInfo"></div>
-  </div>
-</div>
-<div id="singlePotOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; width:420px; max-height:70vh; overflow:auto;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3 id="singlePotTitle" style="text-align:center; margin-bottom:16px;"></h3>
-    <div id="singlePotList"></div>
-  </div>
-</div>
-<footer style="text-align:center; padding:16px; color:var(--muted); font-size:12px; border-top:1px solid var(--border);">© 2026 EarnHub. All rights reserved.</footer>
 
-<div id="withdrawModal" class="modal hidden">
-  <div class="modal-box">
-    <h3>Withdraw Funds</h3>
-    <p style="color:var(--muted); font-size:14px; margin:0 0 8px;">Enter amount to withdraw to bank.</p>
-    <input type="number" id="wdAmt" placeholder="Min: KES 100 — Max: KES 70,000" min="100" max="70000" />
-    <div id="wdErr" style="color:var(--red); font-size:12px; margin-bottom:8px; display:none;">Amount must be between KES 100 and KES 70,000</div>
-    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-      <button class="btn ghost" onclick="setAmt('wdAmt',100)">100</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',150)">150</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',200)">200</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',250)">250</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',500)">500</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',1000)">1000</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',2000)">2000</button>
-      <button class="btn ghost" onclick="setAmt('wdAmt',5000)">5000</button>
-       <button class="btn ghost" onclick="setAmt('wdAmt',10000)">10000</button>
-       <button class="btn ghost" onclick="setAmt('wdAmt', Math.min(balance,70000))">Max</button>
-    </div>
-    <div class="modal-actions">
-       <button class="btn red" onclick="closeWithdraw()">Cancel</button>
-      <button class="btn green" onclick="confirmWithdraw()">Withdraw</button>
-    </div>
-  </div>
-</div>
-
-<div id="wdSuccess" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">✅</div>
-    <h3>Withdrawal Successful</h3>
-    <div class="info" id="wdInfo"></div>
-    <button class="btn green" onclick="closeWdSuccess()">Okay</button>
-  </div>
-</div>
-
-<div id="cdOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">⏳</div>
-    <h3>Reward Already Claimed</h3>
-    <p>No reward for this view — you already claimed it. You can still watch the video.</p>
-    <p>Next reward available in:</p>
-    <div class="info" id="cdInfo"></div>
-    <button class="btn gold" onclick="closeCdOverlay(true)">Okay</button>
-  </div>
-</div>
-
-<div id="depSuccess" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <h3 id="depTitle">Deposit Pending</h3>
-    <div class="info" id="depInfo"></div>
-    <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
-      <a id="depWa" class="btn green" target="_blank" style="display:inline-flex; align-items:center; justify-content:center; padding:10px 16px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
-      <button class="btn" onclick="closeDepSuccess()">Okay</button>
-    </div>
-  </div>
-</div>
-
-<div id="methodOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">💸</div>
-    <h3>Withdraw As</h3>
-    <p>Choose how you want to receive funds.</p>
-    <div style="display:flex; gap:10px; justify-content:center; margin:16px 0;">
-      <button class="btn" onclick="chooseMethod('Airtime')">Airtime</button>
-      <button class="btn green" onclick="chooseMethod('M-Pesa')">M-Pesa</button>
-    </div>
-  </div>
-</div>
-<div id="phoneOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">📱</div>
-    <h3>Enter Phone Number</h3>
-    <input type="tel" id="phoneAmt" placeholder="e.g. 0712345678" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-    <button class="btn green" onclick="confirmPhone()">Confirm</button>
-  </div>
-</div>
-
-<div id="depMethodOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">💳</div>
-    <h3>Deposit From</h3>
-    <p>Choose deposit source.</p>
-    <div id="depMethodErr" style="color:var(--red); font-size:12px; margin-bottom:8px; display:none;">Insufficient bonus. Use M-Pesa.</div>
-    <div style="display:flex; gap:10px; justify-content:center; margin:16px 0;">
-      <button class="btn" onclick="chooseDepMethod('M-Pesa')">M-Pesa</button>
-      <button class="btn gold" onclick="chooseDepMethod('Bonus')">Bonus</button>
-    </div>
-  </div>
-</div>
-<div id="depPhoneOverlay" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">📱</div>
-    <h3>Enter Phone Number</h3>
-    <input type="tel" id="depPhone" placeholder="e.g. 0712345678" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card2); color:var(--text); margin:8px 0;" />
-    <button class="btn green" onclick="confirmDepPhone()">Confirm</button>
-  </div>
-</div>
-
-<div id="refSuccess" class="overlay hidden">
-  <div class="overlay-box" style="position:relative; display:flex; flex-direction:column;">
-    <button onclick="this.closest('.overlay').classList.add('hidden')" style="position:sticky;top:8px;align-self:flex-end;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10; margin-left:auto; display:block;">✕</button>
-    <div class="big">🎉</div>
-    <h3>Referral Bonus Awarded</h3>
-    <p>KES 50.00 has been added to your bonus.</p>
-    <button class="btn gold" style="align-self:center;" onclick="document.getElementById('refSuccess').classList.add('hidden')">Okay</button>
-  </div>
-</div>
-
+<!-- DEPOSIT MODAL -->
 <div id="depositModal" class="modal hidden">
   <div class="modal-box">
-    <h3>Deposit Funds</h3>
-    <p style="color:var(--muted); font-size:14px; margin:0 0 8px;">Enter amount to add to your wallet.</p>
-    <input type="number" id="depAmt" placeholder="Min: KES 100 — Max: KES 70,000" min="100" max="70000" />
-    <div id="depErr" style="color:var(--red); font-size:12px; margin-bottom:8px; display:none;">Amount must be between KES 100 and KES 70,000</div>
-    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-      <button class="btn ghost" onclick="setAmt('depAmt',100)">100</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',150)">150</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',200)">200</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',250)">250</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',500)">500</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',1000)">1000</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',2000)">2000</button>
-      <button class="btn ghost" onclick="setAmt('depAmt',5000)">5000</button>
-       <button class="btn ghost" onclick="setAmt('depAmt',10000)">10000</button>
-       <button class="btn ghost" onclick="setAmt('depAmt', 70000)">Max</button>
+    <div class="modal-header">
+      <h3>Deposit Funds</h3>
+      <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Amount (KES)</label>
+      <input type="number" id="depositAmt" placeholder="Min 100" min="100" max="70000" value="100" />
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Demo: Adds to wallet balance instantly</p>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('depositModal')">Cancel</button>
+      <button class="btn gold" onclick="confirmDeposit()">Deposit</button>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div id="withdrawModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Withdraw Funds</h3>
+      <button class="modal-close" onclick="closeModal('withdrawModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Amount (KES)</label>
+      <input type="number" id="withdrawAmt" placeholder="Min 100" min="100" max="70000" value="100" />
+    </div>
+    <div class="form-group">
+      <label>M-Pesa Phone Number</label>
+      <input type="tel" id="withdrawPhone" placeholder="07XXXXXXXX" />
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">5% fee applies. Demo: Deducts from wallet balance.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('withdrawModal')">Cancel</button>
+      <button class="btn red" onclick="confirmWithdraw()">Withdraw</button>
+    </div>
+  </div>
+</div>
+
+<!-- REDEEM VOUCHER MODAL -->
+<div id="redeemModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Redeem Voucher</h3>
+      <button class="modal-close" onclick="closeModal('redeemModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Voucher Code</label>
+      <input type="text" id="voucherCode" placeholder="Enter code" style="text-transform: uppercase;" />
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">Enter <strong>8479</strong> for KES 70,000 bonus</p>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('redeemModal')">Cancel</button>
+      <button class="btn gold" onclick="confirmRedeem()">Redeem</button>
+    </div>
+  </div>
+</div>
+
+<!-- REDEEM SUCCESS MODAL -->
+<div id="redeemSuccessModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="voucher-success">
+      <div class="big">🎉</div>
+      <h3>Congratulations!</h3>
+      <p>Voucher redeemed successfully</p>
+      <div class="amount" id="redeemAmount">+ KES 70,000.00</div>
+      <p>Added to Bonus Balance</p>
+      <button class="btn gold" style="margin-top: 16px;" onclick="closeModal('redeemSuccessModal')">Awesome!</button>
+    </div>
+  </div>
+</div>
+
+<!-- REFER FRIENDS MODAL -->
+<div id="referModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Refer Friends</h3>
+      <button class="modal-close" onclick="closeModal('referModal')">✕</button>
+    </div>
+    <div class="card" style="margin-bottom: 16px; text-align: center;">
+      <p style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Your Referral Code</p>
+      <div class="ref-code" id="referralCode" style="font-family: monospace; background: var(--card2); padding: 12px 16px; border-radius: 8px; display: inline-block; letter-spacing: 3px; font-size: 18px; font-weight: 800; color: var(--gold);"></div>
+    </div>
+    <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">Share this code. When a friend enters it, you both get KES 50 bonus.</p>
+    
+    <div class="form-group">
+      <label>Enter Friend's Referral Code</label>
+      <input type="text" id="friendRefCode" placeholder="Friend's code" style="text-transform: uppercase;" />
     </div>
     <div class="modal-actions">
-       <button class="btn red" onclick="closeDeposit()">Cancel</button>
-      <button class="btn green" onclick="confirmDeposit()">Deposit</button>
+      <button class="btn ghost" onclick="closeModal('referModal')">Close</button>
+      <button class="btn green" onclick="claimReferral()">Claim Bonus</button>
     </div>
   </div>
 </div>
 
 <script>
-    let balance = 0, tasks = 0, refs = 0, total = 0, bonus = 0, totalWithdrawn = 0, BoosterpotPot = 0, BoosterpotTarget = 0, rocketpotPot = 0, rocketpotTarget = 0, grandJackpotPot = 0, grandJackpotTarget = 0;
-   const txns = [];
-   const activity = [];
-   const BoosterpotWins = [];
-    const rocketpotWins = [];
-    const grandJackpotWins = [];
-   const donations = [];
-   try { const s = JSON.parse(localStorage.getItem('earnhub')||'{}'); balance=s.balance||0; tasks=s.tasks||0; refs=(JSON.parse(localStorage.getItem('refHistory')||'[]')).length; total=s.total||0; bonus=s.bonus||0; totalWithdrawn=s.totalWithdrawn||0; BoosterpotPot=s.BoosterpotPot||0; BoosterpotTarget=s.BoosterpotTarget||0; rocketpotPot=s.rocketpotPot||0; rocketpotTarget=s.rocketpotTarget||0; grandJackpotPot=s.grandJackpotPot||0; grandJackpotTarget=s.grandJackpotTarget||0; if (!BoosterpotPot) BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2)); if (!BoosterpotTarget) BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2)); if (!rocketpotPot) rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); if (!rocketpotTarget) rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); if (!grandJackpotPot) grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2)); if (!grandJackpotTarget) grandJackpotTarget = parseFloat((200000 + Math.random()*49800000).toFixed(2)); if(s.txns) txns.push(...s.txns); if(s.activity) activity.push(...s.activity); if(s.BoosterpotWins) BoosterpotWins.push(...s.BoosterpotWins); if(s.jackpotWins) BoosterpotWins.push(...s.jackpotWins); if(s.rocketpotWins) rocketpotWins.push(...s.rocketpotWins); if(s.megaJackpotWins) rocketpotWins.push(...s.megaJackpotWins); if(s.grandJackpotWins) grandJackpotWins.push(...s.grandJackpotWins); if(s.donations) donations.push(...s.donations); } catch(e){ if(!BoosterpotPot) BoosterpotPot=parseFloat((1100+Math.random()*800).toFixed(2)); if(!BoosterpotTarget) BoosterpotTarget=parseFloat((6999.99+Math.random()*8142.01).toFixed(2)); if(!rocketpotPot) rocketpotPot=parseFloat((14000+Math.random()*15000).toFixed(2)); if(!rocketpotTarget) rocketpotTarget=parseFloat((100000+Math.random()*99999.99).toFixed(2)); if(!grandJackpotPot) grandJackpotPot=parseFloat((10000+Math.random()*15000).toFixed(2)); if(!grandJackpotTarget) grandJackpotTarget=parseFloat((1000000+Math.random()*99000000).toFixed(2)); }
+// ===== STATE MANAGEMENT =====
+let balance = 0, tasks = 0, total = 0, bonus = 0, totalWithdrawn = 0;
+let BoosterpotPot = 0, BoosterpotTarget = 0;
+let rocketpotPot = 0, rocketpotTarget = 0;
+let grandJackpotPot = 0, grandJackpotTarget = 0;
+const txns = [];
+const activity = [];
+const BoosterpotWins = [];
+const rocketpotWins = [];
+const grandJackpotWins = [];
+const referrals = [];
 
-  function money(n){ return 'KES ' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-  function usdMoney(n){ return '$' + Number((n||0)/130).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-    function saveState(){ localStorage.setItem('earnhub', JSON.stringify({balance,tasks,refs,total,bonus,totalWithdrawn,txns,activity,BoosterpotPot,BoosterpotTarget,rocketpotPot,rocketpotTarget,grandJackpotPot,grandJackpotTarget,BoosterpotWins,rocketpotWins,grandJackpotWins,donations})); }
-  function updateUI(){
-    document.getElementById('walletPillAmt').textContent = money(balance);
-    document.getElementById('statBalance').innerHTML = money(balance) + '<small>Wallet balance</small>';
-    document.getElementById('statTasks').innerHTML = tasks + '<small>Tasks completed</small>';
-    document.getElementById('statRef').innerHTML = refs + '<small>Friends referred</small>';
-    document.getElementById('wBal').textContent = money(balance);
-    document.getElementById('wTotal').textContent = money(total);
-    const ww = document.getElementById('wWithdrawn'); if (ww) ww.textContent = money(totalWithdrawn);
-    const bb = document.getElementById('bonusBal'); if (bb) bb.textContent = money(bonus);
-    renderTxns(); renderActivity(); saveState();
-  }
-  function reward(amount, label){
-    balance += amount; total += amount; tasks++;
-    txns.unshift({label, amount, time: new Date().toLocaleTimeString()});
-    activity.unshift(label + ' — ' + money(amount));
-    if (activity.length > 8) activity.pop();
-    toast('+' + money(amount) + ' earned!');
-    updateUI();
-  }
-  function renderTxns(){
-    const el = document.getElementById('txns');
-    if (!txns.length){ el.innerHTML = '<p style="color:var(--muted)">No transactions yet.</p>'; return; }
-    el.innerHTML = txns.slice(0,5).map(t => `<div class="wallet-row"><span>${t.label}<br><small style="color:var(--muted)">${t.time}</small></span><strong style="color:${t.amount>=0?'var(--green)':'var(--red)'}">${t.amount>=0?'+':''}${money(t.amount)}</strong></div>`).join('');
-  }
-  function showAllTxns(){ const el=document.getElementById('allTxnsList'); if(!el) return; el.innerHTML = txns.length? txns.map(t=>`<div class="wallet-row"><span>${t.label}<br><small style="color:var(--muted)">${t.time}</small></span><strong style="color:${t.amount>=0?'var(--green)':'var(--red)'}">${t.amount>=0?'+':''}${money(t.amount)}</strong></div>`).join('') : '<p style="color:var(--muted)">No transactions.</p>'; document.getElementById('allTxnsOverlay').classList.remove('hidden'); }
-  function renderActivity(){
-    const el = document.getElementById('activity');
-    if (!activity.length){ el.innerHTML = '<p style="color:var(--muted)">No activity yet. Start earning!</p>'; return; }
-    el.innerHTML = activity.slice(0,5).map(a => {
-      const parts = a.split(' — ');
-      const neg = /lost|withdraw|donat/i.test(parts[0]);
-      return `<div class="wallet-row"><span>${parts[0]}</span><strong style="color:${neg?'var(--red)':'var(--green)'}">${parts[1]||''}</strong></div>`;
-    }).join('');
-  }
-  function showAllActivity(){ const el=document.getElementById('allActivityList'); if(!el) return; el.innerHTML = activity.length? activity.map(a=>{const parts=a.split(' — ');const neg=/lost|withdraw|donat/i.test(parts[0]);return `<div class="wallet-row"><span>${parts[0]}</span><strong style="color:${neg?'var(--red)':'var(--green)'}">${parts[1]||''}</strong></div>`;}).join('') : '<p style="color:var(--muted)">No activity yet.</p>'; document.getElementById('allActivityOverlay').classList.remove('hidden'); }
-  function toast(msg){
-    const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
-    document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
-  }
-  const titles = {home:'Dashboard', videos:'Watch Videos', surveys:'Surveys', dice:'Dice vs AI', refer:'Refer Friends', wallet:'Wallet', profile:'My Profile', contact:'Contact', notifications:'Notifications', redeem:'Redeem Voucher', rules:'Rules', donate:'Donate', wins:'Wins'};
-  const subs = {home:'Welcome back — start earning today.', videos:'Watch short clips for rewards.', surveys:'Share your opinion, get paid.', dice:'Beat the AI and win.', refer:'Invite friends, earn more.', wallet:'Manage your earnings.', profile:'Manage your addresses.', contact:'Get in touch.', notifications:'System notifications.', redeem:'Enter your voucher code.', rules:'Platform rules and guidelines.', donate:'Support a cause.', wins:'Highest and lowest pot wins.'};
-  function show(v){
-    document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
-    document.getElementById(v).classList.remove('hidden');
-    document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active', a.dataset.view===v));
-    document.getElementById('title').textContent = titles[v];
-    document.getElementById('subtitle').textContent = subs[v];
-    if (v === 'surveys'){ const l=document.getElementById('surveyList'); const f1=document.getElementById('surveyForm1'); const f2=document.getElementById('surveyForm2'); if(l) l.classList.remove('hidden'); if(f1) f1.classList.add('hidden'); if(f2) f2.classList.add('hidden'); if (!canDo('lastSurvey')){ document.querySelectorAll('#surveyForm1 input[type="radio"]').forEach(r=>r.checked=false); localStorage.removeItem('surveyState'); } }
-    if (v !== 'dice'){ const b=document.getElementById('betAmt'); if(b) b.value=10; }
-    if (v === 'refer') { refreshRef(); renderRefHistory(); }
-    if (v === 'notifications'){ renderNotifs(); localStorage.setItem('notifLastRead', Date.now()); }
-  }
-  document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',()=>show(a.dataset.view)));
+const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+let rolling = false;
+let currentView = 'dice';
 
-  function addNotif(msg){ const list=JSON.parse(localStorage.getItem('notifs')||'[]'); list.unshift({msg, time:Date.now()}); localStorage.setItem('notifs', JSON.stringify(list.slice(0,50))); }
-  function updateNotifDot(){ const last=+localStorage.getItem('notifLastRead')||0; const list=JSON.parse(localStorage.getItem('notifs')||'[]'); const unread=list.some(n=>n.time>last) || canDo('lastVideo') || canDo('lastSurvey') || canDo('lastSurvey2'); const d=document.getElementById('notifDot'); if(d) d.style.display=unread?'inline-block':'none'; }
-  function renderNotifs(){ const el=document.getElementById('notifList'); if(!el) return; const list=JSON.parse(localStorage.getItem('notifs')||'[]').sort((a,b)=>b.time-a.time); el.innerHTML = list.length? list.slice(0,5).map(n=>`<div class="card" style="padding:8px 12px;"><div>${n.msg}</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">${new Date(n.time).toLocaleString()}</div></div>`).join('') + (list.length>5?'<button class="btn ghost" style="margin-top:10px;" onclick="showAllNotifs()">View All Notifications</button>':'') : '<div style="color:var(--muted);">No notifications.</div>'; }
-  function showAllNotifs(){ const el=document.getElementById('allNotifsList'); if(!el) return; const list=JSON.parse(localStorage.getItem('notifs')||'[]').sort((a,b)=>b.time-a.time); el.innerHTML = list.length? list.map(n=>`<div class="card" style="padding:8px 12px;"><div>${n.msg}</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">${new Date(n.time).toLocaleString()}</div></div>`).join('') : '<div style="color:var(--muted);">No notifications.</div>'; document.getElementById('allNotifsOverlay').classList.remove('hidden'); }
-  const COOLDOWN = 24*60*60*1000;
-  function canDo(key){ const last = localStorage.getItem(key); return !last || (Date.now()-+last) >= COOLDOWN; }
-  function stamp(key){ localStorage.setItem(key, Date.now()); }
-  let pendingCdUrl = null;
-  function watchVideo(url,key){
-    if (canDo(key)){
-      stamp(key); reward(10,'Watched short video'); window.open(url,'_blank');
-    } else {
-      const last = +localStorage.getItem(key);
-      const rem = (24*60*60*1000) - (Date.now()-last);
-      const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000);
-      document.getElementById('cdInfo').innerHTML = `<div><span>Time remaining</span><strong>${h}h ${m}m ${s}s</strong></div>`;
-      pendingCdUrl = url;
-      document.getElementById('cdOverlay').classList.remove('hidden');
-    }
+// ===== INIT =====
+function init() {
+  loadState();
+  if (!balance || balance === 0) balance = 10000;
+  if (!BoosterpotPot || BoosterpotPot === 0) BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2));
+  if (!BoosterpotTarget || BoosterpotTarget === 0) BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2));
+  if (!rocketpotPot || rocketpotPot === 0) rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2));
+  if (!rocketpotTarget || rocketpotTarget === 0) rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2));
+  if (!grandJackpotPot || grandJackpotPot === 0) grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2));
+  if (!grandJackpotTarget || grandJackpotTarget === 0) grandJackpotTarget = parseFloat((200000 + Math.random()*49800000).toFixed(2));
+  if (!referrals.length && !localStorage.getItem('earnhub_refs')) {
+    // Generate referral code
+    const code = 'EH' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    localStorage.setItem('earnhub_ref_code', code);
   }
-  function closeCdOverlay(go){
-    document.getElementById('cdOverlay').classList.add('hidden');
-    if (go && pendingCdUrl){ window.open(pendingCdUrl,'_blank'); pendingCdUrl=null; }
-  }
-  function openSurvey(n){
-    document.getElementById('surveyList').classList.add('hidden');
-    const f1 = document.getElementById('surveyForm1'); const f2 = document.getElementById('surveyForm2');
-    if (f1) f1.classList.add('hidden'); if (f2) f2.classList.add('hidden');
-    const f = document.getElementById('surveyForm'+n); if (f) f.classList.remove('hidden');
-    const key = n===1?'lastSurvey':'lastSurvey2';
-    if (!canDo(key)){ document.querySelectorAll('#surveyForm'+n+' input[type="radio"]').forEach(r=>r.checked=false); } 
-  }
-  function closeSurvey(){ document.getElementById('surveyForm1').classList.add('hidden'); document.getElementById('surveyForm2').classList.add('hidden'); document.getElementById('surveyList').classList.remove('hidden'); }
-  function saveSurveyState(){
-    const s = {};
-    ['q1','q2','q3'].forEach(q=>{ const r=document.querySelector('input[name="'+q+'"]:checked'); if (r) s[q]=r.value; });
-    localStorage.setItem('surveyState', JSON.stringify(s));
-  }
-  function loadSurveyState(){
-    try { const s=JSON.parse(localStorage.getItem('surveyState')||'{}'); Object.keys(s).forEach(q=>{ const r=document.querySelector('input[name="'+q+'"][value="'+s[q]+'"]'); if (r) r.checked=true; }); } catch(e){}
-  }
-  document.querySelectorAll('#surveyForm1 input[type="radio"]').forEach(r=>r.addEventListener('change', saveSurveyState));
-  function submitSurvey2(){
-    if (!canDo('lastSurvey2')){ toast('Already completed. Check timer for next reward.'); return; }
-    const q4=document.querySelector('input[name="q4"]:checked');
-    const q5=document.querySelector('input[name="q5"]:checked');
-    const q6=document.querySelector('input[name="q6"]:checked');
-    if (!q4||!q5||!q6){ toast('Please answer all questions'); return; }
-    stamp('lastSurvey2'); reward(50,'Completed survey'); closeSurvey();
-  }
-  function submitSurvey(){
-    if (!canDo('lastSurvey')){ toast('Already completed. Check timer for next reward.'); return; }
-    const q1=document.querySelector('input[name="q1"]:checked');
-    const q2=document.querySelector('input[name="q2"]:checked');
-    const q3=document.querySelector('input[name="q3"]:checked');
-    if (!q1||!q2||!q3){ toast('Please answer all questions'); return; }
-    stamp('lastSurvey'); reward(50,'Completed survey');
-    localStorage.removeItem('surveyState');
-    closeSurvey();
-  }
-  const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
-  let rolling = false;
-  function rollDice(){
-    const bet = parseFloat(document.getElementById('betAmt').value);
-    if (!bet || bet < 10 || bet > 70000){ toast('Bet must be between KES 10 and KES 70,000'); return; }
-    if (bet > balance){ toast('Insufficient balance'); return; }
-     balance -= bet; updateUI();
-     BoosterpotPot += bet * 0.0121;
-      rocketpotPot += bet * 0.0676;
-      grandJackpotPot += bet * 0.714236989;
-   updateBoosterpotUI();
-   updaterocketpotUI();
-   updateGrandJackpotUI();
-      updateGrandJackpotUI();
-     if (rolling) { rolling = false; const b=document.getElementById('rollBtn'); if(b) b.disabled=false; }
-    rolling = true;
-    const ud = document.getElementById('userDice'); const ad = document.getElementById('aiDice');
-    ud.classList.add('rolling'); ad.classList.add('rolling');
-    const status = document.getElementById('diceStatus');
-    const result = document.getElementById('diceResult');
-    status.textContent = 'Rolling...';
-    result.textContent = '';
-    let ticks = 0;
-    const iv = setInterval(()=>{
-      try {
-        document.getElementById('userDice').textContent = faces[Math.floor(Math.random()*6)];
-        document.getElementById('aiDice').textContent = faces[Math.floor(Math.random()*6)];
-        ticks++;
-        if (ticks > 12){
-          clearInterval(iv);
-          const user = Math.floor(Math.random()*6)+1;
-          const ai = Math.floor(Math.random()*6)+1;
-          document.getElementById('userDice').textContent = faces[user-1];
-          document.getElementById('aiDice').textContent = faces[ai-1];
-          document.getElementById('userDice').classList.remove('rolling');
-          document.getElementById('aiDice').classList.remove('rolling');
-          if (user > ai){ status.textContent = 'Your turn result: Win!'; result.textContent = `You rolled ${user}, AI rolled ${ai} — You win ${money(bet*2)}!`; result.style.color='var(--green)'; balance += bet*2; total += bet; txns.unshift({label:'Won dice vs AI', amount:bet*2, time:new Date().toLocaleTimeString()}); activity.unshift('Won dice vs AI — ' + money(bet*2)); updateUI(); }
-          else if (user < ai){ status.textContent = 'AI wins this round'; result.textContent = `You rolled ${user}, AI rolled ${ai} — AI wins.`; result.style.color='var(--red)'; toast('Lost ' + money(bet)); txns.unshift({label:'Lost dice vs AI', amount:-bet, time:new Date().toLocaleTimeString()}); activity.unshift('Lost dice vs AI — ' + money(bet)); updateUI(); }
-           else { status.textContent = 'Tie'; result.textContent = `Tie (${user}). Bet refunded.`; result.style.color='var(--muted)'; balance += bet; updateUI(); }
-           if (BoosterpotPot >= BoosterpotTarget){ const prize=BoosterpotTarget; balance += prize; BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2)); BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2)); txns.unshift({label:'Boosterpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Boosterpot won — ' + money(prize)); BoosterpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updateBoosterpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('BoosterpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('BoosterpotOverlay').classList.remove('hidden'); }
-            if (rocketpotPot >= rocketpotTarget){ const prize=rocketpotTarget; balance += prize; rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2)); rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2)); txns.unshift({label:'Rocketpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Rocketpot won — ' + money(prize)); rocketpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updaterocketpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('rocketpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('rocketpotOverlay').classList.remove('hidden'); }
-            if (grandJackpotPot >= grandJackpotTarget){ const prize=grandJackpotTarget; balance += prize; grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2)); grandJackpotTarget = parseFloat((200000 + Math.random()*49800000).toFixed(2)); txns.unshift({label:'Grand Jackpot win', amount:prize, time:new Date().toLocaleTimeString()}); activity.unshift('Grand Jackpot won — ' + money(prize)); grandJackpotWins.unshift({amount:prize, time:new Date().toLocaleString()}); saveState(); updateUI(); updateGrandJackpotUI(); renderTxns(); renderActivity(); const jp=document.getElementById('grandJackpotPrize'); if(jp) jp.textContent='+ '+money(prize); document.getElementById('grandJackpotOverlay').classList.remove('hidden'); }
-         }
-      } catch(e){ clearInterval(iv); rolling=false; btn.disabled=false; }
-    }, 80);
-    setTimeout(()=>{ rolling=false; btn.disabled=false; }, 1200);
-  }
-  function updateBoosterpotUI(){ const p=document.getElementById('BoosterpotPot'); if(p) p.textContent=BoosterpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-   function updaterocketpotUI(){ const p=document.getElementById('rocketpotPot'); if(p) p.textContent=rocketpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-   function updateGrandJackpotUI(){ const p=document.getElementById('grandJackpotPot'); if(p) p.textContent=grandJackpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-   function showBoosterpotHistory(){
-     const j=document.getElementById('BoosterpotWinsList'); const m=document.getElementById('rocketpotWinsList'); const g=document.getElementById('grandJackpotWinsList');
-     if(j) j.innerHTML = BoosterpotWins.length? BoosterpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
-     if(m) m.innerHTML = rocketpotWins.length? rocketpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
-     if(g) g.innerHTML = grandJackpotWins.length? grandJackpotWins.map(w=>`<div style="padding:8px; margin-bottom:6px; background:var(--card); border-radius:8px; text-align:center;"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">None yet.</p>';
-     document.getElementById('BoosterpotHistoryOverlay').classList.remove('hidden');
-   }
-   function showSinglePotHistory(type){ const title=document.getElementById('singlePotTitle'); const list=document.getElementById('singlePotList'); if(!list) return; const isBoosterpot = type==='Boosterpot'; const isRocketpot = type==='Rocketpot'; const wins = (isBoosterpot? BoosterpotWins : isRocketpot? rocketpotWins : grandJackpotWins).slice(0,5); const color = isBoosterpot? 'var(--gold)' : isRocketpot? '#a855f7' : '#ef4444'; const name = isBoosterpot? 'Boosterpot' : isRocketpot? 'Rocketpot' : 'Grand Jackpot'; if(title) title.textContent = '🏆 ' + name + ' History'; list.innerHTML = wins.length? `<div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; font-weight:700; padding:8px 0; border-bottom:1px solid var(--border);"><div>Amount</div><div>Time</div></div>` + wins.map(w=>`<div style="display:grid; grid-template-columns:1fr 1.6fr; gap:8px; padding:8px 0; border-bottom:1px solid var(--border);"><div style="font-weight:700; color:var(--green);">${money(w.amount)}</div><div style="font-size:13px; color:var(--text); font-weight:600;">${w.time}</div></div>`).join('') : '<p style="color:var(--muted); text-align:center;">No wins yet.</p>'; document.getElementById('singlePotOverlay').classList.remove('hidden'); }
-  function setAmt(id,n){ const el=document.getElementById(id); if(el) el.value=n; }
-  function toggleTheme(){ const b=document.body; const light=b.classList.toggle('light'); localStorage.setItem('theme', light?'light':'dark'); document.getElementById('themeToggle').textContent = light?'☀️ Light':'🌙 Dark'; }
-  (function(){ if (localStorage.getItem('theme')==='light'){ document.body.classList.add('light'); const t=document.getElementById('themeToggle'); if(t) t.textContent='☀️ Light'; } })();
-   function showWalletPopup(){ const el=document.getElementById('walletPopupInfo'); if(!el) return; el.innerHTML = `<div><span>Available balance</span><strong>${document.getElementById('wBal').textContent}</strong></div><div><span>Bonus</span><strong>${document.getElementById('bonusBal').textContent}</strong></div><div><span>Total earned</span><strong>${document.getElementById('wTotal').textContent}</strong></div><div><span>Total withdrawn</span><strong>${document.getElementById('wWithdrawn').textContent}</strong></div>`; document.getElementById('walletPopupOverlay').classList.remove('hidden'); }
-   function closeWithdraw(){ document.getElementById('withdrawModal').classList.add('hidden'); document.getElementById('wdAmt').value=''; document.getElementById('wdErr').style.display='none'; }
-  let wdMethod='', wdAmtVal=0;
-  function confirmWithdraw(){
-    const amt = parseFloat(document.getElementById('wdAmt').value);
-    const err = document.getElementById('wdErr');
-    if (!amt || amt < 100 || amt > 70000){ err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }
-    if (amt > balance){ err.textContent='Insufficient balance'; err.style.display='block'; setTimeout(()=>{err.style.display='none'; err.textContent='Amount must be between KES 100 and KES 70,000';},5000); return; }
-    err.style.display='none';
-    wdAmtVal = amt;
-    closeWithdraw();
-    document.getElementById('methodOverlay').classList.remove('hidden');
-  }
-  function chooseMethod(m){
-    wdMethod = m;
-    document.getElementById('methodOverlay').classList.add('hidden');
-    document.getElementById('phoneOverlay').classList.remove('hidden');
-    const p = document.getElementById('phoneAmt'); if (p) p.value = localStorage.getItem('wdAddr')||'';
-  }
-  function confirmPhone(){
-    const phone = document.getElementById('phoneAmt').value.trim();
-    if (!phone){ toast('Enter phone number'); return; }
-    document.getElementById('phoneOverlay').classList.add('hidden');
-    document.getElementById('activationOverlay').classList.remove('hidden');
-  }
-  function closeWdSuccess(){ document.getElementById('wdSuccess').classList.add('hidden'); }
-  function withdraw(){ if (!localStorage.getItem('verified')){ toast('Please verify your profile first'); return; } document.getElementById('withdrawModal').classList.remove('hidden'); document.getElementById('wdAmt').focus(); document.getElementById('wdErr').style.display='none'; }
-  function deposit(){ if (!localStorage.getItem('verified')){ toast('Please verify your profile first'); return; } document.getElementById('depositModal').classList.remove('hidden'); document.getElementById('depAmt').focus(); document.getElementById('depErr').style.display='none'; }
-  function closeDeposit(){ document.getElementById('depositModal').classList.add('hidden'); document.getElementById('depAmt').value=''; document.getElementById('depErr').style.display='none'; }
-  let depAmtVal=0;
-  function confirmDeposit(){
-    const amt = parseFloat(document.getElementById('depAmt').value);
-    const err = document.getElementById('depErr');
-    if (!amt || amt < 100 || amt > 70000){ err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }
-    err.style.display='none';
-    depAmtVal = amt;
-    closeDeposit();
-    document.getElementById('depMethodOverlay').classList.remove('hidden');
-  }
-  function chooseDepMethod(m){
-    document.getElementById('depMethodOverlay').classList.add('hidden');
-    if (m === 'Bonus'){
-      if (bonus < depAmtVal){ document.getElementById('depMethodErr').style.display='block'; setTimeout(()=>document.getElementById('depMethodErr').style.display='none',5000); document.getElementById('depMethodOverlay').classList.remove('hidden'); return; }
-      document.getElementById('depMethodErr').style.display='none';
-      bonus -= depAmtVal; balance += depAmtVal; total += depAmtVal;
-      txns.unshift({label:'Deposit (Bonus)', amount:depAmtVal, time:new Date().toLocaleTimeString()});
-      activity.unshift('Deposit — ' + money(depAmtVal));
-      document.getElementById('depTitle').textContent = 'Deposit Successful';
-      document.getElementById('depInfo').innerHTML = `<div><span>Amount</span><strong>${money(depAmtVal)}</strong></div><div><span>Source</span><strong>Bonus</strong></div><div><span>Status</span><strong>Completed</strong></div>`;
-      document.getElementById('depSuccess').classList.remove('hidden');
   updateUI();
-  updateNotifDot();
+  updatePotUI();
+  showView('dice');
+}
+init();
+
+// ===== LOCALSTORAGE =====
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('earnhub_dice') || '{}');
+    balance = s.balance || 10000;
+    tasks = s.tasks || 0;
+    total = s.total || 0;
+    bonus = s.bonus || 0;
+    totalWithdrawn = s.totalWithdrawn || 0;
+    BoosterpotPot = s.BoosterpotPot || parseFloat((1100 + Math.random()*800).toFixed(2));
+    BoosterpotTarget = s.BoosterpotTarget || parseFloat((6999.99 + Math.random()*8142.01).toFixed(2));
+    rocketpotPot = s.rocketpotPot || parseFloat((14000 + Math.random()*15000).toFixed(2));
+    rocketpotTarget = s.rocketpotTarget || parseFloat((100000 + Math.random()*99999.99).toFixed(2));
+    grandJackpotPot = s.grandJackpotPot || parseFloat((10000 + Math.random()*15000).toFixed(2));
+    grandJackpotTarget = s.grandJackpotTarget || parseFloat((200000 + Math.random()*49800000).toFixed(2));
+    if (s.txns) txns.push(...s.txns);
+    if (s.activity) activity.push(...s.activity);
+    if (s.BoosterpotWins) BoosterpotWins.push(...s.BoosterpotWins);
+    if (s.rocketpotWins) rocketpotWins.push(...s.rocketpotWins);
+    if (s.grandJackpotWins) grandJackpotWins.push(...s.grandJackpotWins);
+  } catch(e) {
+    balance = 10000;
+    BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2));
+    BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2));
+    rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2));
+    rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2));
+    grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2));
+    grandJackpotTarget = parseFloat((200000 + Math.random()*49800000).toFixed(2));
+  }
+}
+
+function saveState() {
+  localStorage.setItem('earnhub_dice', JSON.stringify({
+    balance, tasks, total, bonus, totalWithdrawn,
+    BoosterpotPot, BoosterpotTarget,
+    rocketpotPot, rocketpotTarget,
+    grandJackpotPot, grandJackpotTarget,
+    txns, activity, BoosterpotWins, rocketpotWins, grandJackpotWins
+  }));
+}
+
+// ===== UI HELPERS =====
+function money(n) {
+  return 'KES ' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function updateUI() {
+  document.getElementById('walletPill').textContent = money(balance);
+  document.getElementById('betAmt').max = Math.min(70000, balance);
+  
+  // Wallet view
+  const wb = document.getElementById('walletBalance');
+  const bb = document.getElementById('bonusBalance');
+  const rb = document.getElementById('referralBonus');
+  const rc = document.getElementById('referralCode');
+  
+  if (wb) wb.textContent = money(balance);
+  if (bb) bb.textContent = money(bonus);
+  if (rb) rb.textContent = money(referrals.length * 50);
+  if (rc) rc.textContent = localStorage.getItem('earnhub_ref_code') || 'EH' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function updatePotUI() {
+  const bp = document.getElementById('BoosterpotPot');
+  const rp = document.getElementById('rocketpotPot');
+  const gp = document.getElementById('grandJackpotPot');
+  if (bp) bp.textContent = BoosterpotPot.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (rp) rp.textContent = rocketpotPot.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (gp) gp.textContent = grandJackpotPot.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function setAmt(id, n) {
+  const el = document.getElementById(id);
+  if (el) el.value = n;
+}
+
+// ===== VIEW SWITCHING =====
+function showView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+  document.getElementById(view + 'View').classList.remove('hidden');
+  currentView = view;
+  updateUI(); // Refresh wallet data when switching to wallet view
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+function closeOverlay(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+// ===== DICE GAME LOGIC =====
+function rollDice() {
+  const bet = parseFloat(document.getElementById('betAmt').value);
+  if (!bet || bet < 10 || bet > 70000) { toast('Bet must be between KES 10 and KES 70,000'); return; }
+  if (bet > balance) { toast('Insufficient balance'); return; }
+  if (rolling) return;
+
+  balance -= bet;
+  updateUI();
+
+  BoosterpotPot += bet * 0.0121;
+  rocketpotPot += bet * 0.0676;
+  grandJackpotPot += bet * 0.714236989;
+  updatePotUI();
+
+  rolling = true;
+  const rollBtn = document.getElementById('rollBtn');
+  rollBtn.disabled = true;
+  rollBtn.textContent = 'Rolling...';
+
+  const ud = document.getElementById('userDice');
+  const ad = document.getElementById('aiDice');
+  ud.classList.add('rolling');
+  ad.classList.add('rolling');
+
+  const status = document.getElementById('diceStatus');
+  const result = document.getElementById('diceResult');
+  status.textContent = 'Rolling...';
+  status.className = 'status';
+  result.textContent = '';
+
+  let ticks = 0;
+  const iv = setInterval(() => {
+    try {
+      ud.textContent = faces[Math.floor(Math.random()*6)];
+      ad.textContent = faces[Math.floor(Math.random()*6)];
+      ticks++;
+      if (ticks > 12) {
+        clearInterval(iv);
+        const user = Math.floor(Math.random()*6) + 1;
+        const ai = Math.floor(Math.random()*6) + 1;
+        ud.textContent = faces[user-1];
+        ad.textContent = faces[ai-1];
+        ud.classList.remove('rolling');
+        ad.classList.remove('rolling');
+
+        let winAmount = 0;
+        if (user > ai) {
+          winAmount = bet * 2;
+          balance += winAmount;
+          total += bet;
+          status.textContent = 'You Win!';
+          status.className = 'status win';
+          result.textContent = `You rolled ${user}, AI rolled ${ai} — You win ${money(winAmount)}!`;
+          result.style.color = 'var(--green)';
+          txns.unshift({label: 'Won dice vs AI', amount: winAmount, time: new Date().toLocaleTimeString()});
+          activity.unshift('Won dice vs AI — ' + money(winAmount));
+          toast('+' + money(winAmount) + ' won!');
+        } else if (user < ai) {
+          status.textContent = 'AI Wins';
+          status.className = 'status lose';
+          result.textContent = `You rolled ${user}, AI rolled ${ai} — AI wins.`;
+          result.style.color = 'var(--red)';
+          toast('Lost ' + money(bet));
+          txns.unshift({label: 'Lost dice vs AI', amount: -bet, time: new Date().toLocaleTimeString()});
+          activity.unshift('Lost dice vs AI — ' + money(bet));
+        } else {
+          balance += bet;
+          status.textContent = 'Tie — Bet Refunded';
+          status.className = 'status tie';
+          result.textContent = `Tie (${user}). Bet refunded.`;
+          result.style.color = 'var(--muted)';
+        }
+
+        updateUI();
+        checkJackpots();
+        saveState();
+
+        rolling = false;
+        rollBtn.disabled = false;
+        rollBtn.textContent = 'Roll Dice';
+      }
+    } catch(e) {
+      clearInterval(iv);
+      rolling = false;
+      rollBtn.disabled = false;
+      rollBtn.textContent = 'Roll Dice';
+    }
+  }, 80);
+
+  setTimeout(() => {
+    if (rolling) {
+      clearInterval(iv);
+      rolling = false;
+      rollBtn.disabled = false;
+      rollBtn.textContent = 'Roll Dice';
+    }
+  }, 1500);
+}
+
+function checkJackpots() {
+  if (BoosterpotPot >= BoosterpotTarget) {
+    const prize = BoosterpotTarget;
+    balance += prize;
+    BoosterpotPot = parseFloat((1100 + Math.random()*800).toFixed(2));
+    BoosterpotTarget = parseFloat((6999.99 + Math.random()*8142.01).toFixed(2));
+    txns.unshift({label: 'Boosterpot win', amount: prize, time: new Date().toLocaleTimeString()});
+    activity.unshift('Boosterpot won — ' + money(prize));
+    BoosterpotWins.unshift({amount: prize, time: new Date().toLocaleString()});
+    updateUI();
+    updatePotUI();
+    document.getElementById('boosterpotPrize').textContent = '+ ' + money(prize);
+    document.getElementById('boosterpotOverlay').classList.remove('hidden');
+    toast('🏆 Boosterpot won: ' + money(prize));
+  }
+
+  if (rocketpotPot >= rocketpotTarget) {
+    const prize = rocketpotTarget;
+    balance += prize;
+    rocketpotPot = parseFloat((14000 + Math.random()*15000).toFixed(2));
+    rocketpotTarget = parseFloat((100000 + Math.random()*99999.99).toFixed(2));
+    txns.unshift({label: 'Rocketpot win', amount: prize, time: new Date().toLocaleTimeString()});
+    activity.unshift('Rocketpot won — ' + money(prize));
+    rocketpotWins.unshift({amount: prize, time: new Date().toLocaleString()});
+    updateUI();
+    updatePotUI();
+    document.getElementById('rocketpotPrize').textContent = '+ ' + money(prize);
+    document.getElementById('rocketpotOverlay').classList.remove('hidden');
+    toast('💎 Rocketpot won: ' + money(prize));
+  }
+
+  if (grandJackpotPot >= grandJackpotTarget) {
+    const prize = grandJackpotTarget;
+    balance += prize;
+    grandJackpotPot = parseFloat((10000 + Math.random()*15000).toFixed(2));
+    grandJackpotTarget = parseFloat((200000 + Math.random()*49800000).toFixed(2));
+    txns.unshift({label: 'Grand Jackpot win', amount: prize, time: new Date().toLocaleTimeString()});
+    activity.unshift('Grand Jackpot won — ' + money(prize));
+    grandJackpotWins.unshift({amount: prize, time: new Date().toLocaleString()});
+    updateUI();
+    updatePotUI();
+    document.getElementById('grandJackpotPrize').textContent = '+ ' + money(prize);
+    document.getElementById('grandJackpotOverlay').classList.remove('hidden');
+    toast('💎 GRAND JACKPOT won: ' + money(prize));
+  }
+}
+
+// ===== WALLET ACTIONS =====
+function confirmDeposit() {
+  const amt = parseFloat(document.getElementById('depositAmt').value);
+  if (!amt || amt < 100) { toast('Min deposit KES 100'); return; }
+  balance += amt;
+  total += amt;
+  txns.unshift({label: 'Deposit', amount: amt, time: new Date().toLocaleTimeString()});
+  activity.unshift('Deposited — ' + money(amt));
+  updateUI();
+  saveState();
+  closeModal('depositModal');
+  toast('Deposited ' + money(amt));
+}
+
+function confirmWithdraw() {
+  const amt = parseFloat(document.getElementById('withdrawAmt').value);
+  const phone = document.getElementById('withdrawPhone').value.trim();
+  if (!amt || amt < 100) { toast('Min withdraw KES 100'); return; }
+  if (!phone) { toast('Enter M-Pesa number'); return; }
+  if (amt > balance) { toast('Insufficient balance'); return; }
+  
+  const fee = Math.round(amt * 0.05);
+  const net = amt - fee;
+  balance -= amt;
+  totalWithdrawn += amt;
+  txns.unshift({label: 'Withdrawal (fee: ' + money(fee) + ')', amount: -amt, time: new Date().toLocaleTimeString()});
+  activity.unshift('Withdrew — ' + money(net) + ' (fee: ' + money(fee) + ')');
+  updateUI();
+  saveState();
+  closeModal('withdrawModal');
+  toast('Withdrawn ' + money(net) + ' (fee: ' + money(fee) + ')');
+}
+
+function confirmRedeem() {
+  const code = document.getElementById('voucherCode').value.trim().toUpperCase();
+  if (!code) { toast('Enter voucher code'); return; }
+  
+  if (code === '8479') {
+    bonus += 70000;
+    txns.unshift({label: 'Voucher redeemed', amount: 70000, time: new Date().toLocaleTimeString()});
+    activity.unshift('Redeemed voucher — ' + money(70000) + ' bonus');
+    updateUI();
+    saveState();
+    closeModal('redeemModal');
+    document.getElementById('redeemAmount').textContent = '+ ' + money(70000);
+    document.getElementById('redeemSuccessModal').classList.remove('hidden');
+    toast('🎉 Voucher redeemed: ' + money(70000) + ' bonus!');
+  } else {
+    toast('Invalid voucher code');
+  }
+}
+
+function claimReferral() {
+  const code = document.getElementById('friendRefCode').value.trim().toUpperCase();
+  if (!code) { toast('Enter friend\'s referral code'); return; }
+  
+  const myCode = localStorage.getItem('earnhub_ref_code');
+  if (code === myCode) { toast('Cannot use your own code'); return; }
+  if (referrals.includes(code)) { toast('Already claimed this referral'); return; }
+  
+  referrals.push(code);
+  bonus += 50;
+  txns.unshift({label: 'Referral bonus', amount: 50, time: new Date().toLocaleTimeString()});
+  activity.unshift('Referral bonus claimed — ' + money(50));
+  updateUI();
+  saveState();
+  closeModal('referModal');
+  toast('Referral bonus: ' + money(50) + ' added!');
+}
+
+// ===== POT HISTORY =====
+function showPotHistory(type) {
+  const overlay = document.getElementById('potHistoryOverlay');
+  const bpList = document.getElementById('boosterpotWinsList');
+  const rpList = document.getElementById('rocketpotWinsList');
+  const gpList = document.getElementById('grandJackpotWinsList');
+
+  function render(list, wins, color) {
+    if (!wins.length) {
+      list.innerHTML = '<p style="color:var(--muted); text-align:center; padding:10px;">No wins yet.</p>';
       return;
     }
-    document.getElementById('depPhoneOverlay').classList.remove('hidden');
-    const dp = document.getElementById('depPhone'); if (dp) dp.value = localStorage.getItem('depAddr')||'';
+    list.innerHTML = wins.slice(0, 10).map(w => 
+      `<div style="padding:6px; margin-bottom:4px; background:var(--card); border-radius:6px; text-align:center;">
+        <div style="font-weight:700; color:${color}; font-size:12px;">${money(w.amount)}</div>
+        <div style="font-size:10px; color:var(--muted); margin-top:1px;">${w.time}</div>
+      </div>`
+    ).join('');
   }
-  if (!localStorage.getItem('refId')) {
-    let c = parseInt(localStorage.getItem('refCounter')||'0') + 1;
-    localStorage.setItem('refCounter', c);
-    localStorage.setItem('refId', c);
-  }
-  function refreshRef(){
-    const id = localStorage.getItem('refId');
-    const el = document.getElementById('refId'); if (el) el.textContent = id;
-    const link = document.getElementById('refLink'); if (link) link.textContent = location.href.split('?')[0] + '?ref=' + id;
-  }
-  function claimReferral(){
-    const val = document.getElementById('refInput').value.trim();
-    const err = document.getElementById('refErr');
-    err.style.display='none';
-    if (!val){ err.textContent='Enter a referral ID'; err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }
-    const hist = JSON.parse(localStorage.getItem('refHistory')||'[]');
-    if (hist.includes(val)){ err.textContent='Already claimed this referral ID'; err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }
-    hist.push(val); localStorage.setItem('refHistory', JSON.stringify(hist));
-    bonus += 50; updateUI();
-    const sr = document.getElementById('statRef'); if (sr) sr.innerHTML = hist.length + '<small>Friends referred</small>';
-    activity.unshift('Referral bonus claimed — ' + money(50));
-    saveState(); renderActivity();
-    toast('Bonus KES 50.00 awarded!');
-    const o = document.getElementById('refSuccess'); if (o) o.classList.remove('hidden');
-    renderRefHistory();
-  }
-  function renderRefHistory(){ const el=document.getElementById('refHistory'); if(!el) return; const hist=JSON.parse(localStorage.getItem('refHistory')||'[]'); el.innerHTML = hist.length? hist.map(h=>`<div style="padding:4px 0; border-bottom:1px solid var(--border);">${h}</div>`).join('') : '<p style="color:var(--muted)">No referrals claimed yet.</p>'; }
-  let selectedFirm = '';
-  function selectFirm(name){ selectedFirm=name; document.getElementById('donateFirms').classList.add('hidden'); document.getElementById('donateForm').classList.remove('hidden'); document.getElementById('donateFirmName').textContent='Donate to '+name; document.getElementById('donateAmt').value=''; document.getElementById('donateErr').style.display='none'; }
-  function backToFirms(){ document.getElementById('donateForm').classList.add('hidden'); document.getElementById('donateFirms').classList.remove('hidden'); }
-   function doDonate(){ const amt=parseFloat(document.getElementById('donateAmt').value); const err=document.getElementById('donateErr'); err.style.display='none';     if (isNaN(amt) || amt<100){ err.textContent='Amount must be KES 100 or more'; err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; } if (amt>balance){ err.textContent='Insufficient balance'; err.style.display='block'; setTimeout(()=>err.style.display='none',5000); return; }     balance -= amt; updateUI();     txns.unshift({label:'Donation to '+selectedFirm, amount:-amt, time:new Date().toLocaleTimeString()}); activity.unshift('Donated — ' + money(amt) + ' to ' + selectedFirm); donations.unshift({firm:selectedFirm, amount:amt, time:new Date().toLocaleTimeString()}); saveState(); renderTxns(); renderActivity(); document.getElementById('donateInfo').innerHTML = `<div><span>Amount</span><strong>${money(amt)}</strong></div><div><span>To</span><strong>${selectedFirm}</strong></div><div><span>Status</span><strong>Completed</strong></div>`; document.getElementById('donateOverlay').classList.remove('hidden'); backToFirms(); }
-  function showDonationHistory(){ const el=document.getElementById('donationHistoryList'); if(!el) return; if(!donations.length){ el.innerHTML='<p style="color:var(--muted); text-align:center;">No donations yet.</p>'; document.getElementById('donationHistoryOverlay').classList.remove('hidden'); return; } el.innerHTML = `<div style="display:grid; grid-template-columns:1.2fr 1fr 1.4fr; gap:8px; font-weight:700; padding:8px 0; border-bottom:1px solid var(--border);"><div style="color:#a855f7;">Firm</div><div style="color:#a855f7;">Amount</div><div style="color:#a855f7;">Time</div></div>` + donations.map(d=>`<div style="display:grid; grid-template-columns:1.2fr 1fr 1.4fr; gap:8px; padding:8px 0; border-bottom:1px solid var(--border);"><div>${d.firm}</div><div style="color:var(--red); font-weight:600;">${money(d.amount)}</div><div style="font-size:11px;color:var(--muted);">${d.time}</div></div>`).join(''); document.getElementById('donationHistoryOverlay').classList.remove('hidden'); }
-  function redeemVoucher(){ const input=document.getElementById('voucherInput'); const val = input.value.trim(); if (val === '8479'){ bonus += 70000; input.value=''; activity.unshift('Redeemed voucher — KES 70,000 bonus'); saveState(); updateUI(); renderActivity(); const o=document.getElementById('congratsOverlay'); o.querySelector('h3').textContent='Congratulations!'; o.querySelector('p:nth-of-type(2)').innerHTML='<strong>KES 70,000.00</strong> has been added to your bonus wallet.'; o.classList.remove('hidden'); addNotif('Redeemed voucher: KES 70,000 bonus'); } else if (val === '8571'){ balance += 200; input.value=''; txns.unshift({label:'Voucher', amount:200, time:new Date().toLocaleTimeString()}); activity.unshift('Redeemed voucher — ' + money(200)); saveState(); updateUI(); renderTxns(); renderActivity(); const o=document.getElementById('congratsOverlay'); o.querySelector('h3').textContent='Congratulations!'; o.querySelector('p:nth-of-type(2)').innerHTML='<strong>KES 200.00</strong> has been added to your wallet.'; o.classList.remove('hidden'); addNotif('Redeemed voucher: KES 200 wallet'); } else { input.value=''; const err=document.getElementById('voucherErr'); if(err){ err.style.display='block'; err.textContent='Invalid voucher. Contact supervisor for voucher.'; setTimeout(()=>err.style.display='none',5000); } } }
-    function bindAddr(type){
-    const id = type==='wd'?'wdAddr':'depAddr';
-    const val = document.getElementById(id).value.trim();
-    if (!val){ toast('Enter number'); return; }
-    localStorage.setItem(type+'Addr', val);
-    toast('Bound');
-    addNotif((type==='wd'?'Withdrawal':'Deposit')+' M-Pesa number bound: '+val);
-    loadProfile();
-  }
-  function changeAddr(type){
-    const id = type==='wd'?'wdAddr':'depAddr';
-    const el = document.getElementById(id);
-    el.disabled = false;
-    el.value = localStorage.getItem(type+'Addr')||'';
-    el.focus();
-    addNotif((type==='wd'?'Withdrawal':'Deposit')+' M-Pesa number changed');
-  }
-  function vNext(step){
-    if (step===1){ const n=document.getElementById('legalName').value.trim(); if(!n){ toast('Enter your full legal name'); return; } localStorage.setItem('verifyStep','2'); document.getElementById('vStep1').classList.add('hidden'); document.getElementById('vStep2').classList.remove('hidden'); }
-    else if (step===2){ const f=document.querySelector('#vStep2 input[type=file]'); if(!f||!f.files.length){ toast('Upload ID front'); return; } localStorage.setItem('verifyStep','3'); document.getElementById('vStep2').classList.add('hidden'); document.getElementById('vStep3').classList.remove('hidden'); }
-    else if (step===3){ const f=document.querySelector('#vStep3 input[type=file]'); if(!f||!f.files.length){ toast('Upload ID back'); return; } localStorage.setItem('verifyStep','4'); document.getElementById('vStep3').classList.add('hidden'); document.getElementById('vStep4').classList.remove('hidden'); }
-  }
-  function vBack(step){
-    if (step===2){ document.getElementById('vStep2').classList.add('hidden'); document.getElementById('vStep1').classList.remove('hidden'); localStorage.setItem('verifyStep','1'); }
-    else if (step===3){ document.getElementById('vStep3').classList.add('hidden'); document.getElementById('vStep2').classList.remove('hidden'); localStorage.setItem('verifyStep','2'); }
-    else if (step===4){ document.getElementById('vStep4').classList.add('hidden'); document.getElementById('vStep3').classList.remove('hidden'); localStorage.setItem('verifyStep','3'); }
-  }
-  function vSubmit(){
-    const f=document.querySelector('#vStep4 input[type=file]'); if(!f||!f.files.length){ toast('Upload selfie'); return; }
-    document.getElementById('vStep4').classList.add('hidden');
-    const st = document.getElementById('vStatus'); st.textContent='Under review...';
-    localStorage.setItem('verifyStep','done');
-    localStorage.setItem('verifyTime', Date.now());
-    setTimeout(()=>{ st.textContent='Verified'; toast('Verification complete'); addNotif('Verification complete'); localStorage.setItem('verified','1'); }, 60000);
-  }
-  if (localStorage.getItem('verified')){ const st=document.getElementById('vStatus'); if(st) st.textContent='Verified'; ['vStep1','vStep2','vStep3','vStep4'].forEach(id=>{const e=document.getElementById(id); if(e) e.classList.add('hidden');}); }
-  else { const vs=localStorage.getItem('verifyStep'); if (vs==='done'){ ['vStep1','vStep2','vStep3','vStep4'].forEach(id=>{const e=document.getElementById(id); if(e) e.classList.add('hidden');}); const st=document.getElementById('vStatus'); const t=parseInt(localStorage.getItem('verifyTime')||'0'); const rem=60000-(Date.now()-t); if (rem<=0){ if(st) st.textContent='Verified'; localStorage.setItem('verified','1'); } else { if(st) st.textContent='Under review...'; setTimeout(()=>{ const s=document.getElementById('vStatus'); if(s) s.textContent='Verified'; toast('Verification complete'); addNotif('Verification complete'); localStorage.setItem('verified','1'); }, rem); } } else if (vs && vs!=='done'){ ['vStep1','vStep2','vStep3','vStep4'].forEach(id=>{const e=document.getElementById(id); if(e) e.classList.add('hidden');}); const el=document.getElementById('vStep'+vs); if(el) el.classList.remove('hidden'); } }
-  if (localStorage.getItem('verified')){ const st=document.getElementById('vStatus'); if(st) st.textContent='Verified'; ['vStep1','vStep2','vStep3','vStep4'].forEach(id=>{const e=document.getElementById(id); if(e) e.classList.add('hidden');}); }
-  function loadProfile(){
-    const wd = localStorage.getItem('wdAddr'); if (wd){ document.getElementById('wdAddrShow').textContent='Bound: '+wd; document.getElementById('wdAddr').value=wd; document.getElementById('wdAddr').disabled=true; document.getElementById('wdChange').style.display='inline-block'; }
-    else { document.getElementById('wdAddrShow').textContent=''; document.getElementById('wdAddr').disabled=false; document.getElementById('wdChange').style.display='none'; }
-    const dep = localStorage.getItem('depAddr'); if (dep){ document.getElementById('depAddrShow').textContent='Bound: '+dep; document.getElementById('depAddr').value=dep; document.getElementById('depAddr').disabled=true; document.getElementById('depChange').style.display='inline-block'; }
-    else { document.getElementById('depAddrShow').textContent=''; document.getElementById('depAddr').disabled=false; document.getElementById('depChange').style.display='none'; }
-  }
-  loadProfile();
-  window.claimReferral = claimReferral;
-  window.refreshRef = refreshRef;
-  setInterval(refreshRef,1000);
-  function confirmDepPhone(){
-    const phone = document.getElementById('depPhone').value.trim();
-    if (!phone){ toast('Enter phone number'); return; }
-    document.getElementById('depPhoneOverlay').classList.add('hidden');
-    const msg = encodeURIComponent('Hello, I deposited KES '+Number(depAmtVal).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})+' via M-Pesa from '+phone+'. Please confirm.');
-    const wa = document.getElementById('depWa'); if (wa) wa.href = 'https://wa.me/254743733752?text='+msg;
-    document.getElementById('depTitle').textContent = 'Deposit Pending';
-    document.getElementById('depInfo').innerHTML = `<div><span>Amount</span><strong>${money(depAmtVal)}</strong></div><div><span>Source</span><strong>M-Pesa</strong></div><div><span>Phone</span><strong>${phone}</strong></div><div><span>Status</span><strong>Pending</strong></div><div><span></span><strong>Complete transaction on your phone or contact mentor if unable to get a prompt on your phone</strong></div>`;
-    document.getElementById('depSuccess').classList.remove('hidden');
-    updateUI();
-  }
-  function closeDepSuccess(){ document.getElementById('depSuccess').classList.add('hidden'); }
-   function showPotStat(name){ const wins = name==='Boosterpot'? BoosterpotWins : name==='Rocketpot'? rocketpotWins : grandJackpotWins; const title=document.getElementById('potStatTitle'); const high=document.getElementById('potStatHigh'); const low=document.getElementById('potStatLow'); const count=document.getElementById('potStatCount'); if(title) title.textContent = name; if(wins.length){ const vals=wins.map(w=>w.amount); const h=Math.max(...vals); const l=Math.min(...vals); if(high) high.textContent='+ '+money(h); if(low) low.textContent='+ '+money(l); if(count) count.textContent = wins.length+' win(s) recorded.'; } else { if(high) high.textContent='KES 0.00'; if(low) low.textContent='KES 0.00'; if(count) count.textContent='No wins yet.'; } document.getElementById('potStatOverlay').classList.remove('hidden'); }
-   function updateWinsUI(){ const b=document.getElementById('winsBoosterpotVal'); const r=document.getElementById('winsRocketpotVal'); const g=document.getElementById('winsGrandJackpotVal'); if(b) b.textContent='KES '+BoosterpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(r) r.textContent='KES '+rocketpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); if(g) g.textContent='KES '+grandJackpotPot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-   updateUI();
-   updateBoosterpotUI();
-   updaterocketpotUI();
-   updateGrandJackpotUI();
-   updateWinsUI();
-  setInterval(()=>{
-    [['lastVideo1','vTimer1'],['lastVideo2','vTimer2'],['lastVideo3','vTimer3'],['lastVideo4','vTimer4'],['lastVideo5','vTimer5'],['lastVideo6','vTimer6'],['lastSurvey','sTimer'],['lastSurvey','sTimerList'],['lastSurvey2','sTimer2'],['lastSurvey2','sTimerList2']].forEach(([k,id])=>{
-      const last = localStorage.getItem(k);
-      const el = document.getElementById(id);
-      if (el) { if (!last){ el.textContent=''; } else { const rem = (24*60*60*1000) - (Date.now()-+last); if (rem <= 0){ el.textContent='Available now'; } else { const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000); el.textContent = `Next reward in ${h}h ${m}m ${s}s`; } } }
-      const el2 = document.getElementById('sTimerList'); if (el2 && id==='sTimer') { if (!last){ el2.textContent=''; } else { const rem = (24*60*60*1000) - (Date.now()-+last); if (rem <= 0){ el2.textContent='Available now'; } else { const h=Math.floor(rem/3600000), m=Math.floor((rem%3600000)/60000), s=Math.floor((rem%60000)/1000); el2.textContent = `Next reward in ${h}h ${m}m ${s}s`; } } }
-    });
-  },1000);
+
+  render(bpList, BoosterpotWins, 'var(--gold)');
+  render(rpList, rocketpotWins, '#a855f7');
+  render(gpList, grandJackpotWins, 'var(--red)');
+
+  overlay.classList.remove('hidden');
+}
+
+function showAllPotHistory() {
+  showPotHistory('all');
+}
+
+// Error handling
+window.onerror = function(msg, url, line, col, error) {
+  toast('Error: ' + msg);
+  return true;
+};
+
+console.log('EarnHub Dice vs AI loaded - Demo Mode');
 </script>
-<button id="themeToggle" class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
 </body>
 </html>
